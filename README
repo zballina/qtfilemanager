@@ -1,34 +1,6 @@
-#####################
-Build
-#####################
+Qt File Manager
 
-To build qtFM from source run the following in this directory:
- 
->qmake		(or maybe 'qmake-qt4' depending on your distro)
->make
-
-
-
-#####################
-Install
-#####################
-
-If you install qtFM through your distro as a package then everything should be taken care of already.
-
-If you build qtFM from source you can simply run the binary from the build directory, or to install it
-run the following:
-
->sudo make install
-
-
-This will basically:
-
- - copy the qtfm binary to '/usr/bin'
- - copy 'qtfm.desktop' to '/usr/share/applications'
- - copy './images/qtfm.png' to '/usr/share/pixmaps'
- - copy translations to '/usr/share/qtfm'
- - copy docs to '/usr/share/doc/qtfm' 
-
+Tabbed FM with Bookmarks support, with terminal integrated.  Qt File Manager is based in qtFM 5.5
 
 #####################
 Run
@@ -36,8 +8,8 @@ Run
 
 Command Line Parameters:
 
- $folder	startup folder		- qtFM will start in this folder. Starts in $HOME by default.  
- -d		daemon mode		- starts qtFM and remains running in the background.
+ $folder	startup folder		- Qt File Manager will start in this folder. Starts in $HOME by default.  
+ -d		daemon mode		- starts Qt File Manager and remains running in the background.
 
 				  
 Try adding:
@@ -52,7 +24,7 @@ to your '.xinitrc' file to start automatically at login.
 Icon Themes
 #####################
 
-qtFM will try to detect your icon theme by first asking the system, which should work fine under full
+Qt File Manager will try to detect your icon theme by first asking the system, which should work fine under full
 Gnome/KDE environments.  For some reason Xfce always reports 'gnome' icon theme. (See below)
 
 If this fails it will then try to read '~/.gtkrc-2.0' file for 'gtk-icon-theme-name'.
@@ -156,7 +128,7 @@ Command:
 		'Var' can be any text you like and is used as the hint for the input dialog.
 		 eg. '%iPassword'
 			
- []	-	tick the checkbox to monitor the output of the command. qtFM will be notified and report stdout and stderr
+ []	-	tick the checkbox to monitor the output of the command. Qt File Manager will be notified and report stdout and stderr
 		messages after the command has completed.
 
 
@@ -206,7 +178,7 @@ is easiest.  Send me the completed ts file and I'll add it to the package.
 Tip & Tricks
 #####################
 
-- If you 'Edit filetype' on a folder and set the handler to qtFM you can then 'right-click->Open'
+- If you 'Edit filetype' on a folder and set the handler to Qt File Manager you can then 'right-click->Open'
   on a folder to open in a new instance.
 
 - Middle-click folders or bookmarks to open in a new tab. Ctrl+middle-click to open in a new instance.
@@ -220,7 +192,7 @@ Tip & Tricks
 
 - Right-click on the status bar will bring up the 'View' options.  Useful if you have hidden the main menu.
 
-- When you copy things in qtFM it places the path(s) in the selection buffer so you can then middle-click in
+- When you copy things in Qt File Manager it places the path(s) in the selection buffer so you can then middle-click in
   a text editor for example to 'paste as text'.
 
 - You can also use sequential shortcuts like vi or emacs instead of the combination shortcuts (ctrl+x).
