@@ -35,6 +35,7 @@
 #include <QSortFilterProxyModel>
 #include <QComboBox>
 #include <QSignalMapper>
+#include <qtermwidget.h>
 
 #include "mymodel.h"
 #include "bookmarkmodel.h"
@@ -59,6 +60,11 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event);
+
+protected slots:
+    void propertiesChanged();
+    void actProperties_triggered();
+
 
 public slots:
     void treeSelectionChanged(QModelIndex,QModelIndex);
@@ -90,7 +96,7 @@ public slots:
     void delBookmark();
     void editBookmark();
     void toggleWrapBookmarks();
-    bool xdgConfig();
+    void xdgConfig();
     void readCustomActions();
     void editCustomActions();
     bool copyFolder(QString, QString, qint64, bool);
@@ -153,15 +159,17 @@ private:
     int currentView;        //0=list, 1=icons, 2=details
 
     QCompleter *customComplete;
+    QSettings settings;
 
     tabBar *tabs;
+    QTermWidget *terminal;
+    bool initTerminal;
 
     bool isDaemon;
     QLocalServer daemon;
 
     myProgressDialog * progress;
     propertiesDialog * properties;
-    QSettings *settings;
     QDockWidget *dockTree;
     QDockWidget *dockBookmarks;
     QVBoxLayout *mainLayout;
@@ -244,6 +252,9 @@ private:
     QAction *openTabAct;
     QAction *closeTabAct;
     QAction *tabsOnTopAct;
+    QAction *copyActTerminal;
+    QAction *pasteActTerminal;
+    QAction *propertiesActTerminal;
 };
 
 //---------------------------------------------------------------------------------

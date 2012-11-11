@@ -120,7 +120,6 @@ void myModelItem::refreshFileInfo()
 {
     mFileInfo.refresh();
     mPermissions.clear();
-    mMimeType.clear();
 }
 
 //---------------------------------------------------------------------------------------

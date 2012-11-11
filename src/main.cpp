@@ -1,4 +1,9 @@
 /****************************************************************************
+* This file is part of QtFileManager, a simple, fast file manager with terminal embebed
+* Copyright (C) 2012 Ballina
+*
+* Contact e-mail: zballinita@gmail.com
+*
 * This file is part of qtFM, a simple, fast file manager.
 * Copyright (C) 2010,2011,2012 Wittfella
 *
@@ -31,12 +36,12 @@ int main(int argc, char *argv[])
     if(app.arguments().count() == 1)
     {
         QLocalServer server;
-        if(!server.listen("qtfm"))
+        if(!server.listen("qtfilemanager"))
         {
             QLocalSocket client;
-            client.connectToServer("qtfm");
+            client.connectToServer("qtfilemanager");
             client.waitForConnected(1000);
-            if(client.state() != QLocalSocket::ConnectedState) QFile::remove(QDir::tempPath() + "/qtfm");
+            if(client.state() != QLocalSocket::ConnectedState) QFile::remove(QDir::tempPath() + "/qtfilemanager");
             else
             {
                 client.close();
@@ -48,15 +53,15 @@ int main(int argc, char *argv[])
 
     Q_INIT_RESOURCE(resources);
 
-    app.setOrganizationName("qtfm");
-    app.setApplicationName("qtfm");
+    app.setOrganizationName("qtfilemanager");
+    app.setApplicationName("qtfilemanager");
 
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + QLocale::system().name(),QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
 
     QTranslator qtfmTranslator;
-    qtfmTranslator.load("/usr/share/qtfm/qtfm_" + QLocale::system().name());
+    qtfmTranslator.load("/usr/share/qtfilemanager/qtfm_" + QLocale::system().name());
     app.installTranslator(&qtfmTranslator);
 
     MainWindow mainWin;
