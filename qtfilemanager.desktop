@@ -28,7 +28,7 @@ Comment[zh_TW]=基於純Qt的輕量級檔案管理員
 
 Type=Application
 Icon=system-file-manager
-Exec=QtFileManager
+Exec=qtfilemanager
 Terminal=false
-MimeType=application/x-directory;inode/directory
-Categories=Qt;System;FileManager
+MimeType=application/x-directory;inode/directory;
+Categories=Qt;System;FileManager;
