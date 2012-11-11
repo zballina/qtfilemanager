@@ -2,16 +2,15 @@
 #include <qtermwidget.h>
 
 #include <QDebug>
-
 #include "propertiesdialog.h"
 #include "properties.h"
 #include "config.h"
+#include "ui_propertiesdialog.h"
 
 PropertiesDialog::PropertiesDialog(QWidget *parent)
     : QDialog(parent)
 {
     setupUi(this);
-
     connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()),
             this, SLOT(apply()));
     connect(changeFontButton, SIGNAL(clicked()),
@@ -68,7 +67,6 @@ PropertiesDialog::PropertiesDialog(QWidget *parent)
     dropWidthSpinBox->setValue(Properties::Instance()->dropWidht);
     dropShortCutEdit->setText(Properties::Instance()->dropShortCut.toString());
 }
-
 
 PropertiesDialog::~PropertiesDialog()
 {
@@ -170,12 +168,6 @@ void PropertiesDialog::setupShortcuts()
     }
 
     shortcutsWidget->resizeColumnsToContents();
-/*
-    connect(shortcutsWidget, SIGNAL(currentChanged(int, int)),
-            this, SLOT(recordAction(int, int)));
-    connect(shortcutsWidget, SIGNAL(valueChanged(int, int)),
-            this, SLOT(validateAction(int, int)));
-*/
 }
 
 void PropertiesDialog::recordAction(int row, int column)
@@ -193,53 +185,3 @@ void PropertiesDialog::validateAction(int row, int column)
     else
         item->setText(accelText);
 }
-
-/*
-void PropertiesDialog::setupShortcuts()
-{
-    QList< QString > shortcutKeys = Properties::Instance()->shortcuts.keys();
-    int shortcutCount = shortcutKeys.count();
-
-    shortcutsWidget->setRowCount( shortcutCount );
-
-    for( int x=0; x < shortcutCount; x++ )
-    {
-        QString keyValue = shortcutKeys.at(x);
-
-        QLabel *lblShortcut = new QLabel( keyValue, this );
-        QPushButton *btnLaunch = new QPushButton( Properties::Instance()->shortcuts.value( keyValue ), this );
-
-        btnLaunch->setObjectName(keyValue);
-        connect( btnLaunch, SIGNAL(clicked()), this, SLOT(shortcutPrompt()) );
-
-        shortcutsWidget->setCellWidget( x, 0, lblShortcut );
-        shortcutsWidget->setCellWidget( x, 1, btnLaunch );
-    }
-}
-
-void PropertiesDialog::shortcutPrompt()
-{
-    QObject *objectSender = sender();
-
-    if( !objectSender )
-        return;
-
-    QString name = objectSender->objectName();
-    qDebug() << "shortcutPrompt(" << name << ")";
-
-    DialogShortcut *dlgShortcut = new DialogShortcut(this);
-    dlgShortcut->setTitle( tr("Select a key sequence for %1").arg(name) );
-
-    QString sequenceString = Properties::Instance()->shortcuts[name];
-    dlgShortcut->setKey(sequenceString);
-
-    int result = dlgShortcut->exec();
-    if( result == QDialog::Accepted )
-    {
-        sequenceString = dlgShortcut->getKey();
-        Properties::Instance()->shortcuts[name] = sequenceString;
-        Properties::Instance()->saveSettings();
-    }
-}
-*/
-

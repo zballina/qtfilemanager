@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=qtFM
+Name=Qt File Manager
 Name[de]=Dateimanager qtFM
 Name[sr]=кјутФМ
 Name[sr@ijekavian]=кјутФМ
@@ -27,8 +27,8 @@ Comment[sr@ijekavianlatin]=Lagani menadžer fajlova baziran na čistom Qt-u
 Comment[zh_TW]=基於純Qt的輕量級檔案管理員
 
 Type=Application
-Icon=qtfm
-Exec=qtfm
+Icon=system-file-manager
+Exec=QtFileManager
 Terminal=false
 MimeType=application/x-directory;inode/directory
-Categories=Qt;Utility;FileManager
+Categories=Qt;System;FileManager
