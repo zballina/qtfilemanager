@@ -1,12 +1,7 @@
 #ifndef PROPERTIESDIALOG_H
 #define PROPERTIESDIALOG_H
 
-#include <QtGui/QDialog>
-
-namespace Ui
-{
-    class PropertiesDialog;
-}
+#include "ui_propertiesdialog.h"
 
 class PropertiesDialog : public QDialog, Ui::PropertiesDialog
 {

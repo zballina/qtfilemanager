@@ -5,7 +5,6 @@
 #include "propertiesdialog.h"
 #include "properties.h"
 #include "config.h"
-#include "ui_propertiesdialog.h"
 
 PropertiesDialog::PropertiesDialog(QWidget *parent)
     : QDialog(parent)
