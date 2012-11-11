@@ -17,10 +17,8 @@
         <file>images/key_bindings.png</file>
         <file>images/lock.png</file>
         <file>images/paste.png</file>
-        <file>images/qtfm.png</file>
         <file>images/refresh.png</file>
         <file>images/sep.png</file>
-        <file>images/terminal.png</file>
         <file>images/up.png</file>
         <file>images/window-close.png</file>
         <file>images/zoom-in.png</file>
@@ -28,5 +26,7 @@
         <file>images/preferences.png</file>
         <file>images/properties.png</file>
         <file>images/background.png</file>
+        <file>images/system-file-manager.png</file>
+        <file>images/yakuake.png</file>
     </qresource>
 </RCC>

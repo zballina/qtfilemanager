@@ -51,7 +51,7 @@ void MainWindow::createActionIcons()
         actionIcons->append(QIcon::fromTheme("edit-delete",QIcon(":/images/delete.png")));
         actionIcons->append(QIcon::fromTheme("preferences-system",QIcon(":/images/preferences.png")));
         actionIcons->append(QIcon::fromTheme("document-properties",QIcon(":/images/properties.png")));
-        actionIcons->append(QIcon::fromTheme("utilities-terminal",QIcon(":/images/terminal.png")));
+        actionIcons->append(QIcon::fromTheme("utilities-terminal",QIcon(":/images/yakuake.png")));
         actionIcons->append(QIcon::fromTheme("document-open",QIcon(":/images/document-open.png")));
         actionIcons->append(QIcon::fromTheme("view-refresh",QIcon(":/images/refresh.png")));
         actionIcons->append(QIcon::fromTheme("application-exit",QIcon(":/images/exit.png")));

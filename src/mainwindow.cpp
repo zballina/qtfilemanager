@@ -200,7 +200,7 @@ MainWindow::MainWindow()
     restoreState(settings.value("windowState").toByteArray(),1);
     resize(settings.value("size", QSize(600, 400)).toSize());
 
-    setWindowIcon(QIcon(":/images/qtfm.png"));
+    setWindowIcon(QIcon(":/images/system-file-manager.png"));
 
 
     modelBookmarks = new bookmarkmodel(modelList->folderIcons);
@@ -751,7 +751,7 @@ void MainWindow::openFile()
     else items = listSelectionModel->selectedIndexes();
 
     foreach(QModelIndex index, items)
-	executeFile(index,0);
+    executeFile(index,0);
 }
 
 //---------------------------------------------------------------------------
@@ -992,7 +992,7 @@ void MainWindow::toggleDetails()
 
         stackWidget->setCurrentIndex(1);
         modelList->setMode(thumbsAct->isChecked());
-    	iconAct->setChecked(0);
+        iconAct->setChecked(0);
 
         if(tabs->count())
             tabs->setType(2);
@@ -1040,8 +1040,8 @@ void MainWindow::cutFile()
 
     if(focusWidget() == tree) selList << modelView->mapFromSource(modelList->index(pathEdit->itemText(0)));
     else
-	if(listSelectionModel->selectedRows(0).count()) selList = listSelectionModel->selectedRows(0);
-	else selList = listSelectionModel->selectedIndexes();
+    if(listSelectionModel->selectedRows(0).count()) selList = listSelectionModel->selectedRows(0);
+    else selList = listSelectionModel->selectedIndexes();
 
 
     foreach(QModelIndex item, selList)
@@ -1072,7 +1072,7 @@ void MainWindow::copyFile()
 
     if(selList.count() == 0)
     if(focusWidget() == tree) selList << modelView->mapFromSource(modelList->index(pathEdit->itemText(0)));
-	else return;
+    else return;
 
     clearCutItems();
 
@@ -1126,7 +1126,7 @@ void MainWindow::pasteLauncher(const QMimeData * data, QString newPath, QStringL
 
     if(newPath != baseName)			    //only if not in same directory, otherwise we will do 'Copy(x) of'
     {
-    	foreach(QUrl file, files)
+        foreach(QUrl file, files)
         {
             QFileInfo temp(file.toLocalFile());
 

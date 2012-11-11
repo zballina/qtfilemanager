@@ -31,4 +31,4 @@ Icon=system-file-manager
 Exec=qtfilemanager
 Terminal=false
 MimeType=application/x-directory;inode/directory;
-Categories=Qt;System;FileManager;
+Categories=Qt;System;Filetools;
