@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Qt File Manager
+GenericName=Qt File Manager
+Comment=File Manager light and fast based in Qt
+Type=Application
+Icon=system-file-manager
+Exec=qtfilemanager
+Terminal=false
+MimeType=application/x-directory;inode/directory;
+InitialPreference=10
+Categories=Qt;System;
+
+#TRANSLATIONS_DIR=translations

@@ -23,18 +23,18 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QtGui/QMainWindow>
 #include <QtNetwork/QLocalServer>
 #include <QtNetwork/QLocalSocket>
-#include <QSettings>
-#include <QSplitter>
-#include <QTreeView>
-#include <QListView>
-#include <QLabel>
-#include <QStackedWidget>
-#include <QSortFilterProxyModel>
-#include <QComboBox>
-#include <QSignalMapper>
+#include <QtCore/QSettings>
+#include <QtGui/QSplitter>
+#include <QtGui/QTreeView>
+#include <QtGui/QListView>
+#include <QtGui/QLabel>
+#include <QtGui/QStackedWidget>
+#include <QtGui/QSortFilterProxyModel>
+#include <QtGui/QComboBox>
+#include <QtCore/QSignalMapper>
 #include <qtermwidget.h>
 
 #include "mymodel.h"
@@ -67,7 +67,7 @@ protected slots:
 
 
 public slots:
-    void treeSelectionChanged(QModelIndex,QModelIndex);
+    void treeSelectionChanged(QModelIndex, QModelIndex);
     void listSelectionChanged(const QItemSelection, const QItemSelection);
     void listDoubleClicked(QModelIndex);
     void lateStart();
@@ -144,6 +144,7 @@ signals:
     void copyProgressFinished(int,QStringList);
 
 private:
+    void setSettings();
     void createActions();
     void createActionIcons();
     void createMenus();

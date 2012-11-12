@@ -22,7 +22,8 @@
 #ifndef TABBAR_H
 #define TABBAR_H
 
-#include <QtGui>
+#include <QtGui/QTabBar>
+#include <QtCore/QMimeData>
 
 class tabBar : public QTabBar
 {
@@ -45,16 +46,15 @@ protected:
     void dropEvent(QDropEvent *event);
 
 signals:
-        void dragDropTab(const QMimeData * data, QString newPath, QStringList cutList);
+    void dragDropTab(const QMimeData * data, QString newPath, QStringList cutList);
 
 public slots:
-        void closeTab();
+    void closeTab();
 
 private:
-        QHash<QString,QIcon> *folderIcons;
-        QList<QStringList*> history;
-        QList<int> viewType;
-
+    QHash<QString,QIcon> *folderIcons;
+    QList<QStringList*> history;
+    QList<int> viewType;
 };
 
 #endif // TABBAR_H

@@ -41,7 +41,10 @@ int main(int argc, char *argv[])
             QLocalSocket client;
             client.connectToServer("qtfilemanager");
             client.waitForConnected(1000);
-            if(client.state() != QLocalSocket::ConnectedState) QFile::remove(QDir::tempPath() + "/qtfilemanager");
+            if(client.state() != QLocalSocket::ConnectedState)
+            {
+                QFile::remove(QDir::tempPath() + "/qtfilemanager");
+            }
             else
             {
                 client.close();
