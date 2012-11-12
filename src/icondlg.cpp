@@ -41,9 +41,11 @@ icondlg::icondlg()
     layout->addWidget(buttons);
     setLayout(layout);
 
-    QSettings inherits("/usr/share/icons/" + QIcon::themeName() + "/index.theme",QSettings::IniFormat,this);
+    QSettings inherits("/usr/share/icons/" + QIcon::themeName() + "/index.theme",
+                       QSettings::IniFormat,this);
     foreach(QString theme, inherits.value("Icon Theme/Inherits").toStringList())
-	themes.prepend(theme);
+        themes.prepend(theme);
+
     themes.append(QIcon::themeName());
 
     thread.setFuture(QtConcurrent::run(this,&icondlg::scanTheme));
@@ -55,7 +57,9 @@ void icondlg::scanTheme()
 {
     foreach(QString theme, themes)
     {
-        QDirIterator it("/usr/share/icons/" + theme,QStringList("*.png"),QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks, QDirIterator::Subdirectories);
+        QDirIterator it("/usr/share/icons/" + theme,QStringList("*.png"),
+                        QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks,
+                        QDirIterator::Subdirectories);
         while (it.hasNext())
         {
             it.next();
