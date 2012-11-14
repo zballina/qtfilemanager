@@ -59,8 +59,7 @@ myModelItem* myModelItem::childAt(int position)
 //---------------------------------------------------------------------------------------
 int myModelItem::childCount() const
 {
-    if(walked)
-        return mChildren.count();
+    if(walked) return mChildren.count();
     return 1;
 }
 
@@ -68,8 +67,7 @@ int myModelItem::childCount() const
 bool myModelItem::hasChild(QString fileName)
 {
     foreach(myModelItem * item, mChildren)
-        if(item->fileName() == fileName)
-            return true;
+        if(item->fileName() == fileName) return true;
 
     return false;
 }
@@ -106,10 +104,8 @@ QString myModelItem::absoluteFilePath()const
 //---------------------------------------------------------------------------------------
 QString myModelItem::fileName() const
 {
-    if(mAbsFilePath == "/")
-        return "/";
-    else
-        return mFileInfo.fileName();
+    if(mAbsFilePath == "/") return "/";
+    else return mFileInfo.fileName();
 
 }
 
@@ -124,6 +120,7 @@ void myModelItem::refreshFileInfo()
 {
     mFileInfo.refresh();
     mPermissions.clear();
+    mMimeType.clear();
 }
 
 //---------------------------------------------------------------------------------------
@@ -168,8 +165,7 @@ myModelItem* myModelItem::matchPath(const QStringList& path, int startIndex)
     {
         walked = true;
         QDir dir(this->absoluteFilePath());
-        QFileInfoList all = dir.entryInfoList(QDir::AllEntries
-                                              | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+        QFileInfoList all = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
 
         foreach(QFileInfo one, all)
             new myModelItem(one,this);

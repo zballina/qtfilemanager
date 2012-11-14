@@ -46,6 +46,7 @@ public:
         void populateItem(myModelItem *item);
         void fetchMore(const QModelIndex & parent);
         void refresh();
+        void refreshItems();
         void update();
 
         bool remove(const QModelIndex & index );
@@ -84,6 +85,8 @@ public:
 
 public slots:
         void notifyChange();
+        void notifyProcess(int eventID);
+        void eventTimeout();
         void addWatcher(myModelItem* path);
 
 signals:
@@ -105,9 +108,9 @@ private:
 
         QPalette colors;
         QStringList cutItems;
-        QHash<QString, QString> *mimeGlob;
-        QHash<QString, QString> *mimeGeneric;
-        QHash<QString, QByteArray> *thumbs;
+        QHash<QString,QString> *mimeGlob;
+        QHash<QString,QString> *mimeGeneric;
+        QHash<QString,QByteArray> *thumbs;
 
         myModelItem* rootItem;
         QString currentRootPath;
@@ -116,6 +119,8 @@ private:
         int inotifyFD;
         QSocketNotifier *notifier;
         QHash<int, QString> watchers;
+        QTimer eventTimer;
+        int lastEventID;
 };
 
 #endif // MYMODEL_H

@@ -51,7 +51,7 @@ void MainWindow::createActionIcons()
         actionIcons->append(QIcon::fromTheme("edit-delete",QIcon(":/images/delete.png")));
         actionIcons->append(QIcon::fromTheme("preferences-system",QIcon(":/images/preferences.png")));
         actionIcons->append(QIcon::fromTheme("document-properties",QIcon(":/images/properties.png")));
-        actionIcons->append(QIcon::fromTheme("utilities-terminal",QIcon(":/images/yakuake.png")));
+        actionIcons->append(QIcon::fromTheme("utilities-terminal",QIcon(":/images/terminal.png")));
         actionIcons->append(QIcon::fromTheme("document-open",QIcon(":/images/document-open.png")));
         actionIcons->append(QIcon::fromTheme("view-refresh",QIcon(":/images/refresh.png")));
         actionIcons->append(QIcon::fromTheme("application-exit",QIcon(":/images/exit.png")));
@@ -228,12 +228,6 @@ void MainWindow::createActions()
     terminalAct->setIcon(actionIcons->at(17));
     actionList->append(terminalAct);
 
-    propertiesActTerminal = new QAction(tr("Terminal properties"), this);
-    propertiesActTerminal->setStatusTip(tr("Modify terminal properties"));
-    connect(propertiesActTerminal, SIGNAL(triggered()), this, SLOT(actProperties_triggered()));
-    propertiesActTerminal->setIcon(actionIcons->at(17));
-    actionList->append(propertiesActTerminal);
-
     openAct = new QAction(tr("Open"), this);
     openAct->setStatusTip(tr("Open the file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(openFile()));
@@ -263,7 +257,7 @@ void MainWindow::createActions()
     actionList->append(closeAct);
 
     thumbsAct = new QAction(tr("Show thumbs"), this);
-    thumbsAct->setStatusTip(tr("View thumbnails in icon view"));
+    thumbsAct->setStatusTip(tr("View thumbnails for image files"));
     thumbsAct->setCheckable(true);
     connect(thumbsAct, SIGNAL(triggered()), this, SLOT(toggleThumbs()));
     actionList->append(thumbsAct);
@@ -323,14 +317,14 @@ void MainWindow::createActions()
 void MainWindow::readShortcuts()
 {
     QHash<QString,QString> shortcuts;
-    settings.beginGroup("customShortcuts");
-    QStringList keys = settings.childKeys();
+    settings->beginGroup("customShortcuts");
+    QStringList keys = settings->childKeys();
     for(int i = 0; i < keys.count(); ++i)
     {
-        QStringList temp(settings.value(keys.at(i)).toStringList());
+        QStringList temp(settings->value(keys.at(i)).toStringList());
         shortcuts.insert(temp.at(0),temp.at(1));
     }
-    settings.endGroup();
+    settings->endGroup();
 
     if(shortcuts.count() == 0)
     {
@@ -344,7 +338,6 @@ void MainWindow::readShortcuts()
         shortcuts.insert(homeAct->text(),"f3");
         shortcuts.insert(hiddenAct->text(),"ctrl+h");
         shortcuts.insert(deleteAct->text(),"del");
-        shortcuts.insert(terminalAct->text(),"f4");
         shortcuts.insert(terminalAct->text(),"f4");
         shortcuts.insert(exitAct->text(),"ctrl+q");
         shortcuts.insert(renameAct->text(),"f2");
@@ -433,8 +426,8 @@ void MainWindow::editShortcuts()
 
     if(shortcutConfig->exec() == 1)
     {
-        settings.remove("customShortcuts");
-        settings.beginGroup("customShortcuts");
+        settings->remove("customShortcuts");
+        settings->beginGroup("customShortcuts");
 
         for(int x = 0; x < actionList->count(); ++x)
         {
@@ -449,13 +442,13 @@ void MainWindow::editShortcuts()
 
                 QStringList temp;
                 temp << actionList->at(x)->text() << actionList->at(x)->shortcut().toString();
-                settings.setValue(QString(shortcuts.count()),temp);
+                settings->setValue(QString(shortcuts.count()),temp);
 
                         addAction(actionList->at(x));
             }
         }
 
-        settings.endGroup();
+        settings->endGroup();
     }
 
     if(duplicates.count())
@@ -484,7 +477,6 @@ void MainWindow::createMenus()
     editMenu->addAction(renameAct);
     editMenu->addSeparator();
     editMenu->addAction(editFiletypeAct);
-    editMenu->addAction(propertiesActTerminal);
     editMenu->addAction(customAct);
     editMenu->addAction(shortcutsAct);
     editMenu->addSeparator();
@@ -641,14 +633,16 @@ void MainWindow::focusAction()
         else list->setFocus(Qt::TabFocusReason);
     }
     else
+    {
+        QApplication::clipboard()->blockSignals(0);
         pathEdit->setCompleter(customComplete);
+    }
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::addressChanged(int old, int now)
 {
-    if(!pathEdit->hasFocus())
-        return;
+    if(!pathEdit->hasFocus()) return;
     QString temp = pathEdit->currentText();
 
     if(temp.contains("/."))
@@ -664,8 +658,7 @@ void MainWindow::addressChanged(int old, int now)
         modelTree->invalidate();
     }
 
-    if(temp.length() == now)
-        return;
+    if(temp.length() == now) return;
     int pos = temp.indexOf("/",now);
 
     pathEdit->lineEdit()->blockSignals(1);
@@ -679,11 +672,11 @@ void MainWindow::addressChanged(int old, int now)
     {
         QApplication::clipboard()->blockSignals(1);
         QApplication::clipboard()->clear(QClipboard::Selection);        //don't paste stuff
+
         pathEdit->setCompleter(0);
         tree->setCurrentIndex(modelTree->mapFromSource(modelList->index(temp.left(pos))));
-        //QApplication::clipboard()->clear(QClipboard::Selection);        //don't paste stuff
 
-        QTimer::singleShot(400,this,SLOT(focusAction()));
+        QTimer::singleShot(500,this,SLOT(focusAction()));
     }
     else
     if(!pathEdit->lineEdit()->hasSelectedText())

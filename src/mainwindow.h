@@ -23,19 +23,18 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QtNetwork/QLocalServer>
 #include <QtNetwork/QLocalSocket>
-#include <QtCore/QSettings>
-#include <QtGui/QSplitter>
-#include <QtGui/QTreeView>
-#include <QtGui/QListView>
-#include <QtGui/QLabel>
-#include <QtGui/QStackedWidget>
-#include <QtGui/QSortFilterProxyModel>
-#include <QtGui/QComboBox>
-#include <QtCore/QSignalMapper>
-#include <qtermwidget.h>
+#include <QSettings>
+#include <QSplitter>
+#include <QTreeView>
+#include <QListView>
+#include <QLabel>
+#include <QStackedWidget>
+#include <QSortFilterProxyModel>
+#include <QComboBox>
+#include <QSignalMapper>
 
 #include "mymodel.h"
 #include "bookmarkmodel.h"
@@ -61,13 +60,8 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
 
-protected slots:
-    void propertiesChanged();
-    void actProperties_triggered();
-
-
 public slots:
-    void treeSelectionChanged(QModelIndex, QModelIndex);
+    void treeSelectionChanged(QModelIndex,QModelIndex);
     void listSelectionChanged(const QItemSelection, const QItemSelection);
     void listDoubleClicked(QModelIndex);
     void lateStart();
@@ -96,7 +90,7 @@ public slots:
     void delBookmark();
     void editBookmark();
     void toggleWrapBookmarks();
-    void xdgConfig();
+    bool xdgConfig();
     void readCustomActions();
     void editCustomActions();
     bool copyFolder(QString, QString, qint64, bool);
@@ -144,7 +138,6 @@ signals:
     void copyProgressFinished(int,QStringList);
 
 private:
-    void setSettings();
     void createActions();
     void createActionIcons();
     void createMenus();
@@ -160,17 +153,15 @@ private:
     int currentView;        //0=list, 1=icons, 2=details
 
     QCompleter *customComplete;
-    QSettings settings;
 
     tabBar *tabs;
-    QTermWidget *terminal;
-    bool initTerminal;
 
     bool isDaemon;
     QLocalServer daemon;
 
     myProgressDialog * progress;
     propertiesDialog * properties;
+    QSettings *settings;
     QDockWidget *dockTree;
     QDockWidget *dockBookmarks;
     QVBoxLayout *mainLayout;
@@ -253,9 +244,6 @@ private:
     QAction *openTabAct;
     QAction *closeTabAct;
     QAction *tabsOnTopAct;
-    QAction *copyActTerminal;
-    QAction *pasteActTerminal;
-    QAction *propertiesActTerminal;
 };
 
 //---------------------------------------------------------------------------------

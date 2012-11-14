@@ -45,6 +45,9 @@ void tabBar::mousePressEvent(QMouseEvent * event)
             this->removeTab(tab);
         }
     }
+    else
+    if(event->button() == Qt::RightButton)
+        this->setCurrentIndex(tabAt(event->pos()));
 
     return QTabBar::mousePressEvent(event);
 }
@@ -109,10 +112,8 @@ int tabBar::addNewTab(QString path, int type)
 //---------------------------------------------------------------------------
 void tabBar::setIcon(int index)
 {
-    if(folderIcons->contains(tabText(index)))
-        setTabIcon(index, folderIcons->value(tabText(index)));
-    else
-        setTabIcon(index, QIcon::fromTheme("folder"));
+    if(folderIcons->contains(tabText(index))) setTabIcon(index,folderIcons->value(tabText(index)));
+    else setTabIcon(index,QIcon::fromTheme("folder"));
 }
 
 //---------------------------------------------------------------------------

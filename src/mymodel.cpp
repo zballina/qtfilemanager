@@ -19,7 +19,7 @@
 *
 ****************************************************************************/
 
-#include "mainwindow.h"
+#include <mainwindow.h>
 #include "mymodel.h"
 #include <sys/inotify.h>
 #include <unistd.h>
@@ -36,26 +36,24 @@ myModel::myModel(bool realMime)
     icons = new QCache<QString,QIcon>;
     icons->setMaxCost(500);
 
-    QFile fileIcons(QDir::homePath() + "/.config/qtfilemanager/file.cache");
+    QFile fileIcons(QDir::homePath() + "/.config/qtfm/file.cache");
     fileIcons.open(QIODevice::ReadOnly);
     QDataStream out(&fileIcons);
     out >> *mimeIcons;
     fileIcons.close();
 
-    fileIcons.setFileName(QDir::homePath() + "/.config/qtfilemanager/folder.cache");
+    fileIcons.setFileName(QDir::homePath() + "/.config/qtfm/folder.cache");
     fileIcons.open(QIODevice::ReadOnly);
     out.setDevice(&fileIcons);
     out >> *folderIcons;
     fileIcons.close();
 
-    rootItem = new myModelItem(QFileInfo("/"), new myModelItem(QFileInfo(), 0));
+    rootItem = new myModelItem(QFileInfo("/"),new myModelItem(QFileInfo(),0));
 
     currentRootPath = "/";
 
     QDir root("/");
-    QFileInfoList drives = root.entryInfoList(QDir::AllEntries | QDir::Files
-                                              | QDir::NoDotAndDotDot
-                                              | QDir::Hidden | QDir::System);
+    QFileInfoList drives = root.entryInfoList(QDir::AllEntries | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
 
     foreach(QFileInfo drive, drives)
         new myModelItem(drive,rootItem);
@@ -68,6 +66,7 @@ myModel::myModel(bool realMime)
     inotifyFD = inotify_init();
     notifier = new QSocketNotifier(inotifyFD, QSocketNotifier::Read, this);
     connect(notifier, SIGNAL(activated(int)), this, SLOT(notifyChange()));
+    connect(&eventTimer,SIGNAL(timeout()),this,SLOT(eventTimeout()));
 
     realMimeTypes = realMime;
 }
@@ -89,9 +88,7 @@ QModelIndex myModel::index(int row, int column, const QModelIndex &parent) const
     if(!parentItem) parentItem = rootItem;
 
     myModelItem *childItem = parentItem->childAt(row);
-
-    if(childItem)
-        return createIndex(row, column, childItem);
+        if(childItem) return createIndex(row, column, childItem);
 
     return QModelIndex();
 }
@@ -101,8 +98,7 @@ QModelIndex myModel::index(const QString& path) const
 {
     myModelItem *item = rootItem->matchPath(path.split(SEPARATOR),0);
 
-    if(item)
-        return createIndex(item->childNumber(), 0, item);
+    if(item) return createIndex(item->childNumber(),0,item);
 
     return QModelIndex();
 }
@@ -110,18 +106,15 @@ QModelIndex myModel::index(const QString& path) const
 //---------------------------------------------------------------------------------------
 QModelIndex myModel::parent(const QModelIndex &index) const
 {
-    if(!index.isValid())
-        return QModelIndex();
+    if(!index.isValid()) return QModelIndex();
 
     myModelItem *childItem = static_cast<myModelItem*>(index.internalPointer());
 
-    if(!childItem)
-        return QModelIndex();
+    if(!childItem) return QModelIndex();
 
     myModelItem *parentItem = childItem->parent();
 
-    if (!parentItem || parentItem == rootItem)
-        return QModelIndex();
+    if (!parentItem || parentItem == rootItem) return QModelIndex();
 
     return createIndex(parentItem->childNumber(), 0, parentItem);
 }
@@ -129,12 +122,9 @@ QModelIndex myModel::parent(const QModelIndex &index) const
 //---------------------------------------------------------------------------------------
 bool myModel::isDir(const QModelIndex &index)
 {
-    qDebug() << "realizando static cast";
     myModelItem *item = static_cast<myModelItem*>(index.internalPointer());
-    qDebug() << "static cast realizado";
 
-    if(item && item != rootItem)
-        return item->fileInfo().isDir();
+    if(item && item != rootItem) return item->fileInfo().isDir();
 
     return false;
 }
@@ -144,8 +134,7 @@ QFileInfo myModel::fileInfo(const QModelIndex &index)
 {
     myModelItem *item = static_cast<myModelItem*>(index.internalPointer());
 
-    if(item)
-        return item->fileInfo();
+    if(item) return item->fileInfo();
 
     return QFileInfo();
 }
@@ -155,8 +144,7 @@ qint64 myModel::size(const QModelIndex &index)
 {
     myModelItem *item = static_cast<myModelItem*>(index.internalPointer());
 
-    if(item)
-        return item->fileInfo().size();
+    if(item) return item->fileInfo().size();
 
     return 0;
 }
@@ -166,8 +154,7 @@ QString myModel::fileName(const QModelIndex &index)
 {
     myModelItem *item = static_cast<myModelItem*>(index.internalPointer());
 
-    if(item)
-        return item->fileName();
+    if(item) return item->fileName();
 
     return "";
 }
@@ -177,10 +164,9 @@ QString myModel::filePath(const QModelIndex &index)
 {
     myModelItem *item = static_cast<myModelItem*>(index.internalPointer());
 
-    if(item)
-        return item->absoluteFilePath();
+    if(item) return item->absoluteFilePath();
 
-    return QString();
+    return false;
 }
 
 //---------------------------------------------------------------------------------------
@@ -193,12 +179,9 @@ QString myModel::getMimeType(const QModelIndex &index)
         if(realMimeTypes) item->mMimeType = gGetMimeType(item->absoluteFilePath());
         else
         {
-            if(item->fileInfo().isDir())
-                item->mMimeType = "folder";
-            else
-                item->mMimeType = item->fileInfo().suffix();
-            if(item->mMimeType.isNull())
-                item->mMimeType = "file";
+            if(item->fileInfo().isDir()) item->mMimeType = "folder";
+            else item->mMimeType = item->fileInfo().suffix();
+            if(item->mMimeType.isNull()) item->mMimeType = "file";
         }
     }
 
@@ -215,7 +198,7 @@ void myModel::notifyChange()
 
     QByteArray buffer;
     buffer.resize(buffSize);
-    read(inotifyFD, buffer.data(), buffSize);
+    read(inotifyFD,buffer.data(),buffSize);
     const char *at = buffer.data();
     const char * const end = at + buffSize;
 
@@ -225,51 +208,22 @@ void myModel::notifyChange()
 
         int w = event->wd;
 
-        if(watchers.contains(w))
+        if(eventTimer.isActive())
         {
-            myModelItem *parent = rootItem->matchPath(watchers.value(w).split(SEPARATOR));
-
-            if(parent)
-            {
-                parent->dirty = 1;
-
-                QDir dir(parent->absoluteFilePath());
-                QFileInfoList all = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
-
-                foreach(myModelItem * child, parent->children())
-                {
-                    if(all.contains(child->fileInfo()))
-                    {
-                        //just remove known items
-                        all.removeOne(child->fileInfo());
-                    }
-                    else
-                    {
-                        //must of been deleted, remove from model
-                        if(child->fileInfo().isDir())
-                        {
-                            int wd = watchers.key(child->absoluteFilePath());
-                            inotify_rm_watch(inotifyFD,wd);
-                            watchers.remove(wd);
-                        }
-                        beginRemoveRows(index(parent->absoluteFilePath()),child->childNumber(),child->childNumber());
-                        parent->removeChild(child);
-                        endRemoveRows();
-                    }
-                }
-
-                foreach(QFileInfo one, all)                 //only new items left in list
-                {
-                    beginInsertRows(index(parent->absoluteFilePath()),parent->childCount(),parent->childCount());
-                    new myModelItem(one,parent);
-                    endInsertRows();
-                }
-            }
+            if(w == lastEventID)
+                eventTimer.start(40);
             else
             {
-                inotify_rm_watch(inotifyFD,w);
-                watchers.remove(w);
+                eventTimer.stop();
+                notifyProcess(lastEventID);
+                lastEventID = w;
+                eventTimer.start(40);
             }
+        }
+        else
+        {
+            lastEventID = w;
+            eventTimer.start(40);
         }
 
         at += sizeof(inotify_event) + event->len;
@@ -278,15 +232,70 @@ void myModel::notifyChange()
     notifier->setEnabled(1);
 }
 
+//---------------------------------------------------------------------------------------
+void myModel::eventTimeout()
+{
+    notifyProcess(lastEventID);
+    eventTimer.stop();
+}
+
+//---------------------------------------------------------------------------------------
+void myModel::notifyProcess(int eventID)
+{
+    if(watchers.contains(eventID))
+    {
+        myModelItem *parent = rootItem->matchPath(watchers.value(eventID).split(SEPARATOR));
+
+        if(parent)
+        {
+            parent->dirty = 1;
+
+            QDir dir(parent->absoluteFilePath());
+            QFileInfoList all = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+
+            foreach(myModelItem * child, parent->children())
+            {
+                if(all.contains(child->fileInfo()))
+                {
+                    //just remove known items
+                    all.removeOne(child->fileInfo());
+                }
+                else
+                {
+                    //must of been deleted, remove from model
+                    if(child->fileInfo().isDir())
+                    {
+                        int wd = watchers.key(child->absoluteFilePath());
+                        inotify_rm_watch(inotifyFD,wd);
+                        watchers.remove(wd);
+                    }
+                    beginRemoveRows(index(parent->absoluteFilePath()),child->childNumber(),child->childNumber());
+                    parent->removeChild(child);
+                    endRemoveRows();
+                }
+            }
+
+            foreach(QFileInfo one, all)                 //only new items left in list
+            {
+                beginInsertRows(index(parent->absoluteFilePath()),parent->childCount(),parent->childCount());
+                new myModelItem(one,parent);
+                endInsertRows();
+            }
+        }
+    }
+    else
+    {
+        inotify_rm_watch(inotifyFD,eventID);
+        watchers.remove(eventID);
+    }
+}
+
 //---------------------------------------------------------------------------------
 void myModel::addWatcher(myModelItem *item)
 {
     while(item != rootItem)
     {
-        watchers.insert(inotify_add_watch(inotifyFD,
-                                          item->absoluteFilePath().toLocal8Bit(),
-                                          IN_MOVE | IN_CREATE | IN_DELETE),
-                        item->absoluteFilePath()); //IN_ONESHOT | IN_ALL_EVENTS)
+        watchers.insert(inotify_add_watch(inotifyFD, item->absoluteFilePath().toLocal8Bit(), IN_MOVE | IN_CREATE | IN_DELETE),item->absoluteFilePath()); //IN_ONESHOT | IN_ALL_EVENTS)
         item->watched = 1;
         item = item->parent();
     }
@@ -322,8 +331,7 @@ bool myModel::canFetchMore (const QModelIndex & parent) const
     myModelItem *item = static_cast<myModelItem*>(parent.internalPointer());
 
     if(item)
-        if(item->walked)
-            return false;
+        if(item->walked) return false;
 
     return true;
 
@@ -337,8 +345,10 @@ void myModel::fetchMore (const QModelIndex & parent)
     if(item)
     {
         populateItem(item);
-        emit dataChanged(parent, parent);
+        emit dataChanged(parent,parent);
     }
+
+    return;
 }
 
 //---------------------------------------------------------------------------------------
@@ -347,12 +357,10 @@ void myModel::populateItem(myModelItem *item)
     item->walked = 1;
 
     QDir dir(item->absoluteFilePath());
-    QFileInfoList all = dir.entryInfoList(QDir::AllEntries
-                                          | QDir::NoDotAndDotDot
-                                          | QDir::Hidden | QDir::System);
+    QFileInfoList all = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
 
     foreach(QFileInfo one, all)
-        new myModelItem(one, item);
+        new myModelItem(one,item);
 }
 
 //---------------------------------------------------------------------------------
@@ -365,8 +373,7 @@ int myModel::columnCount(const QModelIndex &parent) const
 int myModel::rowCount(const QModelIndex &parent) const
 {
     myModelItem *item = static_cast<myModelItem*>(parent.internalPointer());
-    if(item)
-        return item->childCount();
+    if(item) return item->childCount();
     return rootItem->childCount();
 }
 
@@ -395,6 +402,15 @@ void myModel::update()
 }
 
 //---------------------------------------------------------------------------------
+void myModel::refreshItems()
+{
+    myModelItem *item = rootItem->matchPath(currentRootPath.split(SEPARATOR));
+
+    item->clearAll();
+    populateItem(item);
+}
+
+//---------------------------------------------------------------------------------
 QModelIndex myModel::insertFolder(QModelIndex parent)
 {
     myModelItem *item = static_cast<myModelItem*>(parent.internalPointer());
@@ -405,20 +421,19 @@ QModelIndex myModel::insertFolder(QModelIndex parent)
     do
     {
         num++;
-        name = QString(tr("new folder %1")).arg(num);
+        name = QString("new_folder%1").arg(num);
     }
     while(item->hasChild(name));
 
 
     QDir temp(currentRootPath);
-    if(!temp.mkdir(name))
-        return QModelIndex();
+    if(!temp.mkdir(name)) return QModelIndex();
 
-    beginInsertRows(parent, item->childCount(), item->childCount());
-    new myModelItem(QFileInfo(currentRootPath + "/" + name), item);
+    beginInsertRows(parent,item->childCount(),item->childCount());
+    new myModelItem(QFileInfo(currentRootPath + "/" + name),item);
     endInsertRows();
 
-    return index(item->childCount() - 1, 0, parent);
+    return index(item->childCount() - 1,0,parent);
 }
 
 //---------------------------------------------------------------------------------
@@ -432,14 +447,13 @@ QModelIndex myModel::insertFile(QModelIndex parent)
     do
     {
         num++;
-        name = QString("new file %1").arg(num);
+        name = QString("new_file%1").arg(num);
     }
     while (item->hasChild(name));
 
 
     QFile temp(currentRootPath + "/" + name);
-    if(!temp.open(QIODevice::WriteOnly))
-        return QModelIndex();
+    if(!temp.open(QIODevice::WriteOnly)) return QModelIndex();
     temp.close();
 
     beginInsertRows(parent,item->childCount(),item->childCount());
@@ -482,13 +496,13 @@ QMimeData * myModel::mimeData(const QModelIndexList & indexes) const
 //---------------------------------------------------------------------------------
 void myModel::cacheInfo()
 {
-    QFile fileIcons(QDir::homePath() + "/.config/qtfilemanager/file.cache");
+    QFile fileIcons(QDir::homePath() + "/.config/qtfm/file.cache");
     fileIcons.open(QIODevice::WriteOnly);
     QDataStream out(&fileIcons);
     out << *mimeIcons;
     fileIcons.close();
 
-    fileIcons.setFileName(QDir::homePath() + "/.config/qtfilemanager/folder.cache");
+    fileIcons.setFileName(QDir::homePath() + "/.config/qtfm/folder.cache");
     fileIcons.open(QIODevice::WriteOnly);
     out.setDevice(&fileIcons);
     out << *folderIcons;
@@ -496,9 +510,8 @@ void myModel::cacheInfo()
 
     if(thumbs->count() > thumbCount)
     {
-        fileIcons.setFileName(QDir::homePath() + "/.config/qtfilemanager/thumbs.cache");
-        if(fileIcons.size() > 5000000)
-            fileIcons.remove();
+        fileIcons.setFileName(QDir::homePath() + "/.config/qtfm/thumbs.cache");
+        if(fileIcons.size() > 10000000) fileIcons.remove();
         else
         {
             fileIcons.open(QIODevice::WriteOnly);
@@ -531,7 +544,7 @@ void myModel::loadMimeTypes() const
             suffix.remove("*.");
             QString mimeName = line.at(0);
             mimeName.replace("/","-");
-            mimeGlob->insert(suffix, mimeName);
+            mimeGlob->insert(suffix,mimeName);
         }
     }
     while (!out.atEnd());
@@ -574,7 +587,7 @@ void myModel::loadThumbs(QModelIndexList indexes)
     {
         if(thumbs->count() == 0)
         {
-            QFile fileIcons(QDir::homePath() + "/.config/qtfilemanager/thumbs.cache");
+            QFile fileIcons(QDir::homePath() + "/.config/qtfm/thumbs.cache");
             fileIcons.open(QIODevice::ReadOnly);
             QDataStream out(&fileIcons);
             out >> *thumbs;
@@ -596,40 +609,30 @@ QByteArray myModel::getThumb(QString item)
 {
     QImage theThumb, background;
     QImageReader pic(item);
-    int w,h,target;
-    w = pic.size().width();
-    h = pic.size().height();
+    int w = pic.size().width();
+    int h = pic.size().height();
+
+    background = QImage(128,128,QImage::Format_RGB32);
+    background.fill(QApplication::palette().color(QPalette::Base).rgb());
 
     if( w > 128 || h > 128)
     {
-        target = 114;
-        background.load(":/images/background.jpg");
+        pic.setScaledSize(QSize(123,93));
+        QImage temp = pic.read();
+
+        theThumb.load(":/images/background.png");           //shadow template
+
+        QPainter painter(&theThumb);
+        painter.drawImage(QPoint(0,0),temp);
     }
     else
     {
-        target = 64;
-        background = QImage(128,128,QImage::Format_ARGB32);
-        background.fill(QApplication::palette().color(QPalette::Base).rgb());
+        pic.setScaledSize(QSize(64,64));
+        theThumb = pic.read();
     }
-
-    if(w > h)
-    {
-        int newHeight = h * target / w;
-        pic.setScaledSize(QSize(target,newHeight));
-    }
-    else
-    {
-        int newWidth = w * target / h;
-        pic.setScaledSize(QSize(newWidth,target));
-    }
-
-    theThumb = pic.read();
-
-    int thumbWidth = theThumb.width();
-    int thumbHeight = theThumb.height();
 
     QPainter painter(&background);
-    painter.drawImage(QPoint((128-thumbWidth)/2,(128 - thumbHeight)/2),theThumb);
+    painter.drawImage(QPoint((123 - theThumb.width())/2,(115 - theThumb.height())/2),theThumb);
 
     QBuffer buffer;
     QImageWriter writer(&buffer,"jpg");
@@ -648,18 +651,19 @@ QVariant myModel::data(const QModelIndex & index, int role) const
     {
         QFileInfo type(item->fileInfo());
 
-        if(cutItems.contains(type.filePath())) return colors.midlight();
-        else if(type.isHidden()) return colors.mid();
+        if(cutItems.contains(type.filePath())) return colors.mid();
+        else if(type.isHidden()) return colors.dark();
         else if(type.isSymLink()) return colors.link();
         else if(type.isDir()) return colors.windowText();
         else if(type.isExecutable()) return QBrush(QColor(Qt::darkGreen));
     }
-    else if(role == Qt::TextAlignmentRole)
+    else
+    if(role == Qt::TextAlignmentRole)
     {
-        if(index.column() == 1)
-            return Qt::AlignRight + Qt::AlignVCenter;
+        if(index.column() == 1) return Qt::AlignRight + Qt::AlignVCenter;
     }
-    else if(role == Qt::DisplayRole)
+    else
+    if(role == Qt::DisplayRole)
     {
         QVariant data;
         switch(index.column())
@@ -766,15 +770,12 @@ QVariant myModel::data(const QModelIndex & index, int role) const
                 else
                 {
                     //try matching generic icon
-                    if(QIcon::hasThemeIcon(mimeGeneric->value(mimeType)))
-                        theIcon = QIcon::fromTheme(mimeGeneric->value(mimeType));
+                    if(QIcon::hasThemeIcon(mimeGeneric->value(mimeType))) theIcon = QIcon::fromTheme(mimeGeneric->value(mimeType));
                     else
                     {
                         //last resort try adding "-x-generic" to base type
-                        if(QIcon::hasThemeIcon(mimeType.split("-").at(0) + "-x-generic"))
-                            theIcon = QIcon::fromTheme(mimeType.split("-").at(0) + "-x-generic");
-                        else
-                            theIcon = QIcon(qApp->style()->standardIcon(QStyle::SP_FileIcon));
+                        if(QIcon::hasThemeIcon(mimeType.split("-").at(0) + "-x-generic")) theIcon = QIcon::fromTheme(mimeType.split("-").at(0) + "-x-generic");
+                        else theIcon = QIcon(qApp->style()->standardIcon(QStyle::SP_FileIcon));
                     }
                 }
             }
@@ -824,9 +825,7 @@ bool myModel::remove(const QModelIndex & theIndex)
     QString path = item->absoluteFilePath();
 
     //physically remove files from disk
-    QDirIterator it(path, QDir::AllEntries | QDir::System
-                    | QDir::NoDotAndDotDot | QDir::Hidden,
-                    QDirIterator::Subdirectories);
+    QDirIterator it(path,QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot | QDir::Hidden, QDirIterator::Subdirectories);
     QStringList children;
 
     while (it.hasNext())
@@ -865,11 +864,11 @@ bool myModel::dropMimeData(const QMimeData * data,Qt::DropAction action,int row,
         QStringList cutList;
 
         //don't do anything if you drag and drop in same folder
-        if(QFileInfo(files.at(0).path()).canonicalPath() == filePath(parent))
-            return false;
+        if(QFileInfo(files.at(0).path()).canonicalPath() == filePath(parent)) return false;
+
 
         Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
-        if(mods != Qt::ControlModifier)              //cut by default, holding ctrl is copy
+        if(mods != Qt::ControlModifier)                                     //cut by default, holding ctrl is copy
             foreach(QUrl item, files)
                 cutList.append(item.path());
 
@@ -882,15 +881,15 @@ bool myModel::dropMimeData(const QMimeData * data,Qt::DropAction action,int row,
 QVariant myModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role == Qt::DisplayRole)
-    switch(section)
-    {
+	switch(section)
+	{
         case 0: return tr("Name");
         case 1: return tr("Size");
         case 2: return tr("Type");
         case 4: return tr("Owner");
         case 3: return tr("Date Modified");
-        default: return QVariant();
-    }
+	    default: return QVariant();
+	}
 
     return QVariant();
 }
@@ -912,7 +911,7 @@ void myModel::addCutItems(QStringList files)
 void myModel::clearCutItems()
 {
     cutItems.clear();
-    QFile(QDir::tempPath() + "/qtfilemanager.temp").remove();
+    QFile(QDir::tempPath() + "/qtfm.temp").remove();
 }
 
 
