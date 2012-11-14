@@ -407,10 +407,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
         this->setVisible(0);
         startDaemon();
+        customComplete->setModel(0);
         modelList->refresh();           //clear model, reduce memory
         tabs->setCurrentIndex(0);
         tree->setCurrentIndex(modelTree->mapFromSource(modelList->index(startPath)));
         tree->scrollTo(tree->currentIndex());
+        customComplete->setModel(modelTree);
 
         event->ignore();
     }
@@ -570,7 +572,7 @@ void MainWindow::listSelectionChanged(const QItemSelection selected, const QItem
     int folders = 0;
     int files = 0;
 
-    foreach(QModelIndex theItem,items)
+    foreach(QModelIndex theItem, items)
     {
         if(modelList->isDir(modelView->mapToSource(theItem)))
             folders++;
@@ -582,15 +584,18 @@ void MainWindow::listSelectionChanged(const QItemSelection selected, const QItem
 
     QString total,name;
 
-    if(!bytes) total = "";
-    else total = formatSize(bytes);
+    if(!bytes)
+        total = "";
+    else
+        total = formatSize(bytes);
 
     if(items.count() == 1)
     {
         QFileInfo file(modelList->filePath(modelView->mapToSource(items.at(0))));
 
         name = file.fileName();
-        if(file.isSymLink()) name = tr("Link --> %1").arg(file.symLinkTarget());
+        if(file.isSymLink())
+            name = tr("Link --> %1").arg(file.symLinkTarget());
 
         statusName->setText(name + "   ");
         statusSize->setText(tr("%1   ").arg(total));
@@ -599,8 +604,10 @@ void MainWindow::listSelectionChanged(const QItemSelection selected, const QItem
     else
     {
         statusName->setText(total + "   ");
-        if(files) statusSize->setText(tr("%1 files  ").arg(files));
-        if(folders) statusDate->setText(tr("%1 folders").arg(folders));
+        if(files)
+            statusSize->setText(tr("%1 files  ").arg(files));
+        if(folders)
+            statusDate->setText(tr("%1 folders").arg(folders));
     }
 }
 
@@ -742,6 +749,20 @@ void MainWindow::executeFile(QModelIndex index, bool run)
         myProcess->startDetached(modelList->filePath(modelView->mapToSource(index)));   //is executable?
     else
     {
+        QString type = modelList->getMimeType(modelView->mapToSource(index));
+
+        QHashIterator<QString, QAction*> i(*customActions);
+        while (i.hasNext())
+        {
+            i.next();
+            if(type.contains(i.key()))
+                if(i.value()->text() == "Open")
+                {
+                    i.value()->trigger();
+                    return;
+                }
+        }
+
         foreach(QAction *action, customActions->values(
                     QFileInfo(modelList->filePath(modelView->mapToSource(index))).completeSuffix()))
             if(action->text() == "Open")
@@ -750,8 +771,18 @@ void MainWindow::executeFile(QModelIndex index, bool run)
                 return;
             }
 
-        myProcess->startDetached("xdg-open", QStringList() <<
-                                 modelList->filePath(modelView->mapToSource(index)));
+        myProcess->start("xdg-open",QStringList() <<
+                         modelList->filePath(modelView->mapToSource(index)));
+        myProcess->waitForFinished(1000);
+        myProcess->terminate();
+        if(myProcess->exitCode() != 0)
+        {
+            if(xdgConfig())
+                executeFile(index,run);
+        }
+
+//        myProcess->startDetached("xdg-open", QStringList() <<
+//                                 modelList->filePath(modelView->mapToSource(index)));
     }
 }
 
@@ -1418,7 +1449,8 @@ bool MainWindow::cutCopyFile(QString source, QString dest, qint64 totalSize, boo
 
     while(!in.atEnd())
     {
-        if(progress->result() == 1) break;                 //cancelled
+        if(progress->result() == 1)
+            break;                 //cancelled
 
         qint64 inBytes = in.read(block, sizeof(block));
         out.write(block, inBytes);
@@ -1426,12 +1458,12 @@ bool MainWindow::cutCopyFile(QString source, QString dest, qint64 totalSize, boo
 
         if(interTotal > steps)
         {
-            emit updateCopyProgress(interTotal,totalSize,dest);
+            emit updateCopyProgress(interTotal, totalSize, dest);
             interTotal = 0;
         }
     }
 
-    emit updateCopyProgress(interTotal,totalSize,dest);
+    emit updateCopyProgress(interTotal, totalSize, dest);
 
     out.close();
     in.close();
@@ -2077,7 +2109,8 @@ void MainWindow::newConnection()
 //---------------------------------------------------------------------------------
 void MainWindow::startDaemon()
 {
-    if(!daemon.listen("qtfilemanager")) isDaemon = 0;
+    if(!daemon.listen("qtfilemanager"))
+        isDaemon = 0;
 }
 
 //---------------------------------------------------------------------------------
@@ -2104,7 +2137,8 @@ bool mainTreeFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex
     myModel* fileModel = qobject_cast<myModel*>(sourceModel());
 
     if(fileModel->isDir(index0))
-        if(this->filterRegExp().isEmpty() || fileModel->fileInfo(index0).isHidden() == 0) return true;
+        if(this->filterRegExp().isEmpty() || fileModel->fileInfo(index0).isHidden() == 0)
+            return true;
 
     return false;
 }
@@ -2112,13 +2146,16 @@ bool mainTreeFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex
 //---------------------------------------------------------------------------------
 bool viewsSortProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    if(this->filterRegExp().isEmpty()) return true;
+    if(this->filterRegExp().isEmpty())
+        return true;
 
     QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
     myModel* fileModel = qobject_cast<myModel*>(sourceModel());
 
-    if(fileModel->fileInfo(index0).isHidden()) return false;
-    else return true;
+    if(fileModel->fileInfo(index0).isHidden())
+        return false;
+    else
+        return true;
 }
 
 //---------------------------------------------------------------------------------

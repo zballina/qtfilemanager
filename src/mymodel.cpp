@@ -36,19 +36,19 @@ myModel::myModel(bool realMime)
     icons = new QCache<QString,QIcon>;
     icons->setMaxCost(500);
 
-    QFile fileIcons(QDir::homePath() + "/.config/qtfm/file.cache");
+    QFile fileIcons(QDir::homePath() + "/.config/qtfilemanager/file.cache");
     fileIcons.open(QIODevice::ReadOnly);
     QDataStream out(&fileIcons);
     out >> *mimeIcons;
     fileIcons.close();
 
-    fileIcons.setFileName(QDir::homePath() + "/.config/qtfm/folder.cache");
+    fileIcons.setFileName(QDir::homePath() + "/.config/qtfilemanager/folder.cache");
     fileIcons.open(QIODevice::ReadOnly);
     out.setDevice(&fileIcons);
     out >> *folderIcons;
     fileIcons.close();
 
-    rootItem = new myModelItem(QFileInfo("/"), new myModelItem(QFileInfo(),0));
+    rootItem = new myModelItem(QFileInfo("/"), new myModelItem(QFileInfo(), 0));
 
     currentRootPath = "/";
 
@@ -129,7 +129,9 @@ QModelIndex myModel::parent(const QModelIndex &index) const
 //---------------------------------------------------------------------------------------
 bool myModel::isDir(const QModelIndex &index)
 {
+    qDebug() << "realizando static cast";
     myModelItem *item = static_cast<myModelItem*>(index.internalPointer());
+    qDebug() << "static cast realizado";
 
     if(item && item != rootItem)
         return item->fileInfo().isDir();
@@ -480,13 +482,13 @@ QMimeData * myModel::mimeData(const QModelIndexList & indexes) const
 //---------------------------------------------------------------------------------
 void myModel::cacheInfo()
 {
-    QFile fileIcons(QDir::homePath() + "/.config/qtfm/file.cache");
+    QFile fileIcons(QDir::homePath() + "/.config/qtfilemanager/file.cache");
     fileIcons.open(QIODevice::WriteOnly);
     QDataStream out(&fileIcons);
     out << *mimeIcons;
     fileIcons.close();
 
-    fileIcons.setFileName(QDir::homePath() + "/.config/qtfm/folder.cache");
+    fileIcons.setFileName(QDir::homePath() + "/.config/qtfilemanager/folder.cache");
     fileIcons.open(QIODevice::WriteOnly);
     out.setDevice(&fileIcons);
     out << *folderIcons;
@@ -494,7 +496,7 @@ void myModel::cacheInfo()
 
     if(thumbs->count() > thumbCount)
     {
-        fileIcons.setFileName(QDir::homePath() + "/.config/qtfm/thumbs.cache");
+        fileIcons.setFileName(QDir::homePath() + "/.config/qtfilemanager/thumbs.cache");
         if(fileIcons.size() > 5000000)
             fileIcons.remove();
         else
@@ -572,7 +574,7 @@ void myModel::loadThumbs(QModelIndexList indexes)
     {
         if(thumbs->count() == 0)
         {
-            QFile fileIcons(QDir::homePath() + "/.config/qtfm/thumbs.cache");
+            QFile fileIcons(QDir::homePath() + "/.config/qtfilemanager/thumbs.cache");
             fileIcons.open(QIODevice::ReadOnly);
             QDataStream out(&fileIcons);
             out >> *thumbs;
@@ -910,7 +912,7 @@ void myModel::addCutItems(QStringList files)
 void myModel::clearCutItems()
 {
     cutItems.clear();
-    QFile(QDir::tempPath() + "/qtfm.temp").remove();
+    QFile(QDir::tempPath() + "/qtfilemanager.temp").remove();
 }
 
 

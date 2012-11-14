@@ -105,9 +105,9 @@ private:
 
         QPalette colors;
         QStringList cutItems;
-        QHash<QString,QString> *mimeGlob;
-        QHash<QString,QString> *mimeGeneric;
-        QHash<QString,QByteArray> *thumbs;
+        QHash<QString, QString> *mimeGlob;
+        QHash<QString, QString> *mimeGeneric;
+        QHash<QString, QByteArray> *thumbs;
 
         myModelItem* rootItem;
         QString currentRootPath;

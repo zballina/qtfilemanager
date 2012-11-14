@@ -100,24 +100,26 @@ void MainWindow::autoBookmarkMounts()
     while (!stream.atEnd());
     mtab.close();
 
+    QStringList sysMounts = QStringList() << "/dev" << "/sys" << "/pro" << "/tmp" << "/run";
     QStringList dontShowList = settings.value("hideBookmarks",0).toStringList();
     mounts.clear();
 
     foreach(QString item, mtabMounts)
-        if(item[0] == '/')
-        {
-            QString path = item.split(" ").at(1);
-            path.replace("\\040"," ");
+        if(!sysMounts.contains(item.split(" ").at(1).left(4)))
+            if(item[0] == '/')
+            {
+                QString path = item.split(" ").at(1);
+                path.replace("\\040"," ");
 
-            mounts.append(path);
-            if(!dontShowList.contains(path))
-                if(!autoBookmarks.contains(path))	    //add a new auto bookmark if it doesn't exist
-                {
-                    if(item.split(" ").at(2) == "iso9660") modelBookmarks->addBookmark(path,path,"1","drive-optical");
-                    else if(item.split(" ").at(2).contains("fat")) modelBookmarks->addBookmark(path,path,"1","drive-removable-media");
-                    else modelBookmarks->addBookmark(path,path,"1","drive-harddisk");
-                }
-        }
+                mounts.append(path);
+                if(!dontShowList.contains(path))
+                    if(!autoBookmarks.contains(path))	    //add a new auto bookmark if it doesn't exist
+                    {
+                        if(item.split(" ").at(2) == "iso9660") modelBookmarks->addBookmark(path,path,"1","drive-optical");
+                        else if(item.split(" ").at(2).contains("fat")) modelBookmarks->addBookmark(path,path,"1","drive-removable-media");
+                        else modelBookmarks->addBookmark(path,path,"1","drive-harddisk");
+                    }
+            }
 
 //remove existing automounts that no longer exist
     foreach(QStandardItem *item, theBookmarks)
@@ -196,8 +198,8 @@ bool bookmarkmodel::dropMimeData(const QMimeData * data,Qt::DropAction action,in
 {
     //moving its own items around
     if(data->hasFormat("application/x-qstandarditemmodeldatalist"))
-	if(parent.column() == -1)
-	    return QStandardItemModel::dropMimeData(data,action,row,column,parent);
+    if(parent.column() == -1)
+        return QStandardItemModel::dropMimeData(data,action,row,column,parent);
 
 
     QList<QUrl> files = data->urls();
