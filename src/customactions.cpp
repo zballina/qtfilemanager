@@ -23,7 +23,7 @@
 #include "icondlg.h"
 #include "customactions.h"
 
-customActionsDialog::customActionsDialog(MainWindow *parent)
+customActionsDialog::customActionsDialog(MainWindowFileManager *parent)
 {
     mainWindow = parent;
 
@@ -81,14 +81,12 @@ customActionsDialog::customActionsDialog(MainWindow *parent)
     setWindowTitle(tr("Custom Actions"));
 }
 
-//---------------------------------------------------------------------------
 void customActionsDialog::accept()
 {
     saveItems();
     this->done(1);
 }
 
-//---------------------------------------------------------------------------
 void customActionsDialog::getIcon(QTreeWidgetItem * item, int column)
 {
     if(column == 2)
@@ -104,7 +102,6 @@ void customActionsDialog::getIcon(QTreeWidgetItem * item, int column)
     return;
 }
 
-//---------------------------------------------------------------------------
 void customActionsDialog::addItem()
 {
     treeWidget->clearSelection();
@@ -116,13 +113,11 @@ void customActionsDialog::addItem()
     treeWidget->scrollToItem(temp);
 }
 
-//---------------------------------------------------------------------------
 void customActionsDialog::delItem()
 {
     delete treeWidget->currentItem();
 }
 
-//---------------------------------------------------------------------------
 void customActionsDialog::infoItem()
 {
     QMessageBox::question(this,tr("Usage"),tr("Use 'folder' to match all folders.<br>" \
@@ -135,7 +130,6 @@ void customActionsDialog::infoItem()
                                "<p>See <a href='http://www.qtfm.org/home/readme'>readme</a> for more help.</p>"));
 }
 
-//---------------------------------------------------------------------------
 void customActionsDialog::readItems()
 {
     QSettings settings;
@@ -155,7 +149,7 @@ void customActionsDialog::readItems()
 
         QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget,QStringList() << temp.at(0) << temp.at(1) << temp.at(2) << cmd,0);
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled|Qt::ItemIsDragEnabled|Qt::ItemIsUserCheckable);
-	
+
         if(setChecked) item->setCheckState(3,Qt::Checked);
         else item->setCheckState(3,Qt::Unchecked);
     }
@@ -174,10 +168,9 @@ void customActionsDialog::readItems()
     }
 
     for(int x = 0;x < treeWidget->topLevelItemCount();x++)
-	treeWidget->topLevelItem(x)->setIcon(2,QIcon::fromTheme(treeWidget->topLevelItem(x)->text(2)));
+    treeWidget->topLevelItem(x)->setIcon(2,QIcon::fromTheme(treeWidget->topLevelItem(x)->text(2)));
 }
 
-//---------------------------------------------------------------------------
 void customActionsDialog::saveItems()
 {
     QSettings settings;
@@ -188,9 +181,9 @@ void customActionsDialog::saveItems()
         QTreeWidgetItem *item = treeWidget->topLevelItem(i);
         QStringList temp;
         QString cmd = item->text(3);
-        
+
         if(item->checkState(3) == Qt::Checked) cmd.prepend("|");
-        
+
         temp << item->text(0) << item->text(1) << item->text(2) << cmd;
         settings.setValue(QString(i),temp);
     }

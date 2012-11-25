@@ -21,7 +21,7 @@
 
 #include <QtGui>
 #include "progressdlg.h"
-#include "mainwindow.h"
+#include "mainwindowfilemanager.h"
 
 //---------------------------------------------------------------------------
 myProgressDialog::myProgressDialog(QString title)

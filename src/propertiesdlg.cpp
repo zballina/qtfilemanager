@@ -20,14 +20,14 @@
 ****************************************************************************/
 
 #include <QtGui>
-#include "propertiesdlg.h"
-#include "icondlg.h"
-#include "mainwindow.h"
 #include <sys/vfs.h>
 #include <sys/stat.h>
-#include <magic.h>
 
-//---------------------------------------------------------------------------
+#include "propertiesdlg.h"
+#include "icondlg.h"
+#include "mainwindowfilemanager.h"
+#include "utils.h"
+
 propertiesDialog::propertiesDialog(QStringList paths, myModel *modelList)
 {
     setWindowTitle(tr("Properties"));
@@ -274,7 +274,8 @@ void propertiesDialog::recurseProperties(QString path)
             if(it.fileInfo().isDir())
             {
                 folders++;
-                if(folders % 32 == 0) emit updateSignal();
+                if(folders % 32 == 0)
+                    emit updateSignal();
             }
             else
             {
@@ -286,21 +287,19 @@ void propertiesDialog::recurseProperties(QString path)
         totalSize += QFileInfo(path).size();
 }
 
-//---------------------------------------------------------------------------
 void propertiesDialog::update()
 {
     sizeInfo->setText(formatSize(totalSize));
-    if(type != 2) containsInfo->setText(QString(tr("%1 Files, %2 folders")).arg(files).arg(folders));
+    if(type != 2)
+        containsInfo->setText(QString(tr("%1 Files, %2 folders")).arg(files).arg(folders));
 }
 
-//---------------------------------------------------------------------------
 void propertiesDialog::finished()
 {
     buttons->button(QDialogButtonBox::Ok)->setEnabled(1);
     this->activateWindow();
 }
 
-//---------------------------------------------------------------------------
 void propertiesDialog::accept()
 {
     this->setResult(1);
@@ -323,7 +322,6 @@ void propertiesDialog::accept()
     this->done(1);
 }
 
-//---------------------------------------------------------------------------
 void propertiesDialog::reject()
 {
     this->setResult(1);
@@ -331,15 +329,12 @@ void propertiesDialog::reject()
     this->done(0);
 }
 
-//---------------------------------------------------------------------------
 void propertiesDialog::checkboxesChanged()
 {
-    permissionsNumeric->setText(QString("%1%2%3").arg(ownerRead->isChecked()*4 + ownerWrite->isChecked()*2 + ownerExec->isChecked())
-                                .arg(groupRead->isChecked()*4 + groupWrite->isChecked()*2 + groupExec->isChecked())
+    permissionsNumeric->setText(QString("%1%2%3").arg(ownerRead->isChecked()*4 + ownerWrite->isChecked()*2 + ownerExec->isChecked()).arg(groupRead->isChecked()*4 + groupWrite->isChecked()*2 + groupExec->isChecked())
                                 .arg(otherRead->isChecked()*4 + otherWrite->isChecked()*2 + otherExec->isChecked()));
 }
 
-//---------------------------------------------------------------------------
 void propertiesDialog::numericChanged(QString text)
 {
     if(text.count() != 3) return;
@@ -360,7 +355,6 @@ void propertiesDialog::numericChanged(QString text)
     otherExec->setChecked(other % 2);
 }
 
-//---------------------------------------------------------------------------
 void propertiesDialog::changeIcon()
 {
     icondlg *icons = new icondlg;
@@ -370,28 +364,4 @@ void propertiesDialog::changeIcon()
         iconButton->setIcon(QIcon::fromTheme(icons->result));
     }
     delete icons;
-}
-
-//---------------------------------------------------------------------------
-QString getDriveInfo(QString path)
-{
-    struct statfs info;
-    statfs(path.toLocal8Bit(), &info);
-
-    if(info.f_blocks == 0) return "";
-
-    return QString("%1  /  %2  (%3%)").arg(formatSize((qint64) (info.f_blocks - info.f_bavail)*info.f_bsize))
-                       .arg(formatSize((qint64) info.f_blocks*info.f_bsize))
-                       .arg((info.f_blocks - info.f_bavail)*100/info.f_blocks);
-}
-
-//---------------------------------------------------------------------------------
-QString gGetMimeType(QString path)
-{
-    magic_t cookie = magic_open(MAGIC_MIME);
-    magic_load(cookie,0);
-    QString temp = magic_file(cookie,path.toLocal8Bit());
-    magic_close(cookie);
-
-    return temp.left(temp.indexOf(";"));
 }

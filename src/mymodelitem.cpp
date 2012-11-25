@@ -184,7 +184,3 @@ myModelItem* myModelItem::matchPath(const QStringList& path, int startIndex)
 
     return 0;
 }
-
-//---------------------------------------------------------------------------------------
-
-

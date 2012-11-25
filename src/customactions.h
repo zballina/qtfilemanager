@@ -25,14 +25,14 @@
 #include <QtGui>
 #include <QDialog>
 
-#include "mainwindow.h"
+#include "mainwindowfilemanager.h"
 
 class customActionsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    customActionsDialog(MainWindow *parent = 0);
+    customActionsDialog(MainWindowFileManager *parent = 0);
 
 
 public slots:
@@ -52,7 +52,7 @@ private:
     QToolButton *addButton;
     QToolButton *delButton;
     QToolButton *infoButton;
-    MainWindow *mainWindow;
+    MainWindowFileManager *mainWindow;
 };
 
 #endif // CUSTOMACTIONS_H

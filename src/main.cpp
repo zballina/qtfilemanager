@@ -19,24 +19,26 @@
 *
 ****************************************************************************/
 
+#define NAME_SERVER "qtfilemanager"
 
 #include <QApplication>
-#include "mainwindow.h"
+#include "mainwindowfilemanager.h"
 
 int main(int argc, char *argv[])
 {
+    setenv("TERM", "xterm", 1);
     QApplication app(argc, argv);
 
     //connect to daemon if available, otherwise create new instance
     if(app.arguments().count() == 1)
     {
         QLocalServer server;
-        if(!server.listen("qtfm"))
+        if(!server.listen(NAME_SERVER))
         {
             QLocalSocket client;
-            client.connectToServer("qtfm");
+            client.connectToServer(NAME_SERVER);
             client.waitForConnected(1000);
-            if(client.state() != QLocalSocket::ConnectedState) QFile::remove(QDir::tempPath() + "/qtfm");
+            if(client.state() != QLocalSocket::ConnectedState) QFile::remove(QDir::tempPath() + "/qtfilemanager");
             else
             {
                 client.close();
@@ -48,18 +50,20 @@ int main(int argc, char *argv[])
 
     Q_INIT_RESOURCE(resources);
 
-    app.setOrganizationName("qtfm");
-    app.setApplicationName("qtfm");
+    app.setOrganizationName(NAME_SERVER);
+    app.setApplicationName(NAME_SERVER);
 
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + QLocale::system().name(),QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
 
     QTranslator qtfmTranslator;
-    qtfmTranslator.load("/usr/share/qtfm/qtfm_" + QLocale::system().name());
+    qtfmTranslator.load("/usr/share/qtfilemanager/qtfilemanager_" + QLocale::system().name());
     app.installTranslator(&qtfmTranslator);
 
-    MainWindow mainWin;
+    MainWindowFileManager mainWin;
+    mainWin.showMaximized();
+
     return app.exec();
 }
 

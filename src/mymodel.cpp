@@ -19,11 +19,12 @@
 *
 ****************************************************************************/
 
-#include <mainwindow.h>
 #include "mymodel.h"
+
 #include <sys/inotify.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include "utils.h"
 
 //---------------------------------------------------------------------------------
 myModel::myModel(bool realMime)
@@ -164,7 +165,8 @@ QString myModel::filePath(const QModelIndex &index)
 {
     myModelItem *item = static_cast<myModelItem*>(index.internalPointer());
 
-    if(item) return item->absoluteFilePath();
+    if(item)
+        return item->absoluteFilePath();
 
     return false;
 }
@@ -881,15 +883,15 @@ bool myModel::dropMimeData(const QMimeData * data,Qt::DropAction action,int row,
 QVariant myModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role == Qt::DisplayRole)
-	switch(section)
-	{
+    switch(section)
+    {
         case 0: return tr("Name");
         case 1: return tr("Size");
         case 2: return tr("Type");
         case 4: return tr("Owner");
         case 3: return tr("Date Modified");
-	    default: return QVariant();
-	}
+        default: return QVariant();
+    }
 
     return QVariant();
 }
@@ -913,6 +915,3 @@ void myModel::clearCutItems()
     cutItems.clear();
     QFile(QDir::tempPath() + "/qtfm.temp").remove();
 }
-
-
-

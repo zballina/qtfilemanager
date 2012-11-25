@@ -19,10 +19,11 @@
 *
 ****************************************************************************/
 
-#include "mainwindow.h"
+#include "mainwindowfilemanager.h"
+#include "properties.h"
 
 //---------------------------------------------------------------------------
-void MainWindow::createActionIcons()
+void MainWindowFileManager::createActionIcons()
 {
     actionIcons = new QList<QIcon>;
 
@@ -70,7 +71,7 @@ void MainWindow::createActionIcons()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createActions()
+void MainWindowFileManager::createActions()
 {
     createActionIcons();
     actionList = new QList<QAction*>;
@@ -314,17 +315,17 @@ void MainWindow::createActions()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::readShortcuts()
+void MainWindowFileManager::readShortcuts()
 {
     QHash<QString,QString> shortcuts;
-    settings->beginGroup("customShortcuts");
-    QStringList keys = settings->childKeys();
+    Properties::Instance()->settings.beginGroup("customShortcuts");
+    QStringList keys = Properties::Instance()->settings.childKeys();
     for(int i = 0; i < keys.count(); ++i)
     {
-        QStringList temp(settings->value(keys.at(i)).toStringList());
+        QStringList temp(Properties::Instance()->settings.value(keys.at(i)).toStringList());
         shortcuts.insert(temp.at(0),temp.at(1));
     }
-    settings->endGroup();
+    Properties::Instance()->settings.endGroup();
 
     if(shortcuts.count() == 0)
     {
@@ -373,17 +374,17 @@ void MainWindow::readShortcuts()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::bookmarkShortcutTrigger()
+void MainWindowFileManager::bookmarkShortcutTrigger()
 {
     QAction* sc = qobject_cast<QAction*>(sender());
     QModelIndex index = modelBookmarks->findItems(sc->text()).first()->index();
-    bookmarksList->clearSelection();
-    bookmarksList->setCurrentIndex(index);
+    listViewPlaces->clearSelection();
+    listViewPlaces->setCurrentIndex(index);
     bookmarkClicked(index);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::editShortcuts()
+void MainWindowFileManager::editShortcuts()
 {
     QDialog *shortcutConfig = new QDialog(this);
     shortcutConfig->setWindowTitle(tr("Configure shortcuts"));
@@ -426,8 +427,8 @@ void MainWindow::editShortcuts()
 
     if(shortcutConfig->exec() == 1)
     {
-        settings->remove("customShortcuts");
-        settings->beginGroup("customShortcuts");
+        Properties::Instance()->settings.remove("customShortcuts");
+        Properties::Instance()->settings.beginGroup("customShortcuts");
 
         for(int x = 0; x < actionList->count(); ++x)
         {
@@ -437,18 +438,19 @@ void MainWindow::editShortcuts()
             {
                 int existing = shortcuts.indexOf(actionList->at(x)->shortcut().toString());
                 if(existing != -1)
-                    duplicates.append(QString("<b>%1</b> - %2").arg(shortcuts.at(existing)).arg(actionList->at(x)->text()));
+                    duplicates.append(QString("<b>%1</b> - %2").arg(shortcuts.at(existing)).arg(
+                                          actionList->at(x)->text()));
                 shortcuts.append(actionList->at(x)->shortcut().toString());
 
                 QStringList temp;
                 temp << actionList->at(x)->text() << actionList->at(x)->shortcut().toString();
-                settings->setValue(QString(shortcuts.count()),temp);
+                Properties::Instance()->settings.setValue(QString(shortcuts.count()),temp);
 
-                        addAction(actionList->at(x));
+                addAction(actionList->at(x));
             }
         }
 
-        settings->endGroup();
+        Properties::Instance()->settings.endGroup();
     }
 
     if(duplicates.count())
@@ -458,7 +460,7 @@ void MainWindow::editShortcuts()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createMenus()
+void MainWindowFileManager::createMenus()
 {
     QMenu *fileMenu = new QMenu(tr("File"));
     fileMenu->addAction(newDirAct);
@@ -508,129 +510,125 @@ void MainWindow::createMenus()
     menuBar->addMenu(editMenu);
     menuBar->addMenu(viewMenu);
 
-    menuToolBar->addWidget(menuBar);
+    toolBarMenu->addWidget(menuBar);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createToolBars()
+void MainWindowFileManager::createToolBars()
 {
-    menuToolBar = addToolBar(tr("Menu"));
-    menuToolBar->setObjectName("Menu");
     addToolBarBreak();
 
-    editToolBar = addToolBar(tr("Edit"));
-    editToolBar->setObjectName("Edit");
-    editToolBar->addAction(cutAct);
-    editToolBar->addAction(copyAct);
-    editToolBar->addAction(pasteAct);
-    editToolBar->addAction(deleteAct);
+    toolBarEdit->addAction(cutAct);
+    toolBarEdit->addAction(copyAct);
+    toolBarEdit->addAction(pasteAct);
+    toolBarEdit->addAction(deleteAct);
 
-    viewToolBar = addToolBar(tr("View"));
-    viewToolBar->setObjectName("View");
-    viewToolBar->addAction(iconAct);
-    viewToolBar->addAction(detailAct);
-    viewToolBar->addAction(hiddenAct);
+    toolBarView->addAction(iconAct);
+    toolBarView->addAction(detailAct);
+    toolBarView->addAction(hiddenAct);
 
-    navToolBar = addToolBar(tr("Navigate"));
-    navToolBar->setObjectName("Navigate");
-    navToolBar->addAction(backAct);
-    navToolBar->addAction(upAct);
-    navToolBar->addAction(homeAct);
+    toolBarNavigation->addAction(backAct);
+    toolBarNavigation->addAction(upAct);
+    toolBarNavigation->addAction(homeAct);
 
-    addressToolBar = addToolBar(tr("Address"));
-    addressToolBar->setObjectName("Address");
-    addressToolBar->addWidget(new QLabel());	    //empty label just for spacing
-    addressToolBar->addWidget(pathEdit);
-    addressToolBar->addAction(terminalAct);
+    toolBarAddress->addWidget(new QLabel());	    //empty label just for spacing
+    toolBarAddress->addWidget(pathEdit);
+    toolBarAddress->addAction(terminalAct);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::zoomInAction()
+void MainWindowFileManager::zoomInAction()
 {
     int zoomLevel;
 
-    if(focusWidget() == tree)
+    if(focusWidget() == treeViewFileSystem)
     {
-        (zoomTree == 64) ? zoomTree=64 : zoomTree+= 8;
-        tree->setIconSize(QSize(zoomTree,zoomTree));
+        (zoomTree == 64) ? zoomTree = 64 : zoomTree += 8;
+        treeViewFileSystem->setIconSize(QSize(zoomTree, zoomTree));
         zoomLevel = zoomTree;
     }
     else
     {
-        if(stackWidget->currentIndex() == 0)
+        if(stackedWidget->currentIndex() == 0)
         {
             if(iconAct->isChecked())
             {
-                (zoom == 128) ? zoom=128 : zoom+= 8;
+                (zoom == 128) ? zoom = 128 : zoom += 8;
                 zoomLevel = zoom;
             }
             else
             {
-                (zoomList == 128) ? zoomList=128 : zoomList+= 8;
+                (zoomList == 128) ? zoomList=128 : zoomList += 8;
                 zoomLevel = zoomList;
             }
             toggleIcons();
         }
         else
         {
-            (zoomDetail == 64) ? zoomDetail=64 : zoomDetail+= 8;
-            detailTree->setIconSize(QSize(zoomDetail,zoomDetail));
+            (zoomDetail == 64) ? zoomDetail = 64 : zoomDetail += 8;
+            treeViewFolders->setIconSize(QSize(zoomDetail, zoomDetail));
             zoomLevel = zoomDetail;
         }
     }
 
-    status->showMessage(QString(tr("Zoom: %1")).arg(zoomLevel));
+
+    labelStatus->setText(QString(tr("Zoom: %1")).arg(zoomLevel));
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::zoomOutAction()
+void MainWindowFileManager::zoomOutAction()
 {
     int zoomLevel;
 
-    if(focusWidget() == tree)
+    if(focusWidget() == treeViewFileSystem)
     {
-        (zoomTree == 16) ? zoomTree=16 : zoomTree-= 8;
-        tree->setIconSize(QSize(zoomTree,zoomTree));
+        (zoomTree == 16) ? zoomTree = 16 : zoomTree -= 8;
+        treeViewFileSystem->setIconSize(QSize(zoomTree, zoomTree));
         zoomLevel = zoomTree;
     }
     else
     {
-        if(stackWidget->currentIndex() == 0)
+        if(stackedWidget->currentIndex() == 0)
         {
             if(iconAct->isChecked())
             {
-                (zoom == 16) ? zoom=16 : zoom-= 8;
+                (zoom == 16) ? zoom = 16 : zoom -= 8;
                 zoomLevel = zoom;
             }
             else
             {
-                (zoomList == 16) ? zoomList=16 : zoomList-= 8;
+                (zoomList == 16) ? zoomList = 16 : zoomList -= 8;
                 zoomLevel = zoomList;
             }
             toggleIcons();
         }
         else
         {
-            (zoomDetail == 16) ? zoomDetail=16 : zoomDetail-= 8;
-            detailTree->setIconSize(QSize(zoomDetail,zoomDetail));
+            (zoomDetail == 16) ? zoomDetail = 16 : zoomDetail -= 8;
+            treeViewFolders->setIconSize(QSize(zoomDetail, zoomDetail));
             zoomLevel = zoomDetail;
         }
     }
 
-    status->showMessage(QString(tr("Zoom: %1")).arg(zoomLevel));
+    labelStatus->setText(QString(tr("Zoom: %1")).arg(zoomLevel));
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::focusAction()
+void MainWindowFileManager::focusAction()
 {
     QAction *which = qobject_cast<QAction*>(sender());
     if(which)
     {
-        if(which->text().contains("address")) pathEdit->setFocus(Qt::TabFocusReason);
-        else if(which->text().contains("tree")) tree->setFocus(Qt::TabFocusReason);
-        else if(which->text().contains("bookmarks")) bookmarksList->setFocus(Qt::TabFocusReason);
-        else if(currentView == 2) detailTree->setFocus(Qt::TabFocusReason);
-        else list->setFocus(Qt::TabFocusReason);
+        if(which->text().contains("address"))
+            pathEdit->setFocus(Qt::TabFocusReason);
+        else if(which->text().contains("tree"))
+            treeViewFileSystem->setFocus(Qt::TabFocusReason);
+        else if(which->text().contains("bookmarks"))
+            listViewPlaces->setFocus(Qt::TabFocusReason);
+        else if(currentView == 2)
+            treeViewFolders->setFocus(Qt::TabFocusReason);
+        else
+            listViewPlaces->setFocus(Qt::TabFocusReason);
     }
     else
     {
@@ -640,9 +638,10 @@ void MainWindow::focusAction()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addressChanged(int old, int now)
+void MainWindowFileManager::addressChanged(int old, int now)
 {
-    if(!pathEdit->hasFocus()) return;
+    if(!pathEdit->hasFocus())
+        return;
     QString temp = pathEdit->currentText();
 
     if(temp.contains("/."))
@@ -665,21 +664,19 @@ void MainWindow::addressChanged(int old, int now)
 
     if(QApplication::keyboardModifiers() == Qt::ControlModifier)
     {
-        tree->setCurrentIndex(modelTree->mapFromSource(modelList->index(temp.left(pos))));
+        treeViewFileSystem->setCurrentIndex(modelTree->mapFromSource(modelList->index(temp.left(pos))));
     }
-    else
-    if(QApplication::mouseButtons() == Qt::MidButton)
+    else if(QApplication::mouseButtons() == Qt::MidButton)
     {
         QApplication::clipboard()->blockSignals(1);
         QApplication::clipboard()->clear(QClipboard::Selection);        //don't paste stuff
 
         pathEdit->setCompleter(0);
-        tree->setCurrentIndex(modelTree->mapFromSource(modelList->index(temp.left(pos))));
+        treeViewFileSystem->setCurrentIndex(modelTree->mapFromSource(modelList->index(temp.left(pos))));
 
-        QTimer::singleShot(500,this,SLOT(focusAction()));
+        QTimer::singleShot(500, this, SLOT(focusAction()));
     }
-    else
-    if(!pathEdit->lineEdit()->hasSelectedText())
+    else if(!pathEdit->lineEdit()->hasSelectedText())
     {
         pathEdit->completer()->setCompletionPrefix(temp.left(pos) + "/");
         pathEdit->completer()->complete();

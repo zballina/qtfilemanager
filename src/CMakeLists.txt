@@ -10,16 +10,12 @@ INCLUDE_DIRECTORIES(
     ${QTERMWIDGET_INCLUDE_DIR}
 )
 
-set(QTFILEMANAGER_SRC_AUX
-    bookmarks.cpp
-    actions.cpp
-)
 set(QTFILEMANAGER_HEADERS
 )
 
 set(QTFILEMANAGER_SOURCES
     main.cpp
-    mainwindow.cpp
+    mainwindowfilemanager.cpp
     customactions.cpp
     icondlg.cpp
     progressdlg.cpp
@@ -29,10 +25,12 @@ set(QTFILEMANAGER_SOURCES
     properties.cpp
     mymodel.cpp
     mymodelitem.cpp
+    utils.cpp
+    bookmarkmodel.cpp
 )
 
 set(QTFILEMANAGER_MOC_SOURCES
-    mainwindow.h
+    mainwindowfilemanager.h
     bookmarkmodel.h
     customactions.h
     icondlg.h
@@ -41,10 +39,12 @@ set(QTFILEMANAGER_MOC_SOURCES
     propertiesdlg.h
     tabbar.h
     mymodel.h
+    bookmarkmodel.h
 )
 
 set(QTFILEMANAGER_UI_SOURCES
     forms/propertiesdialog.ui
+    forms/mainwindowfilemanager.ui
 )
 
 set(QTFILEMANAGER_RCC_SRC

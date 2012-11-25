@@ -155,7 +155,3 @@ void tabBar::closeTab()
     viewType.removeAt(this->currentIndex());
     removeTab(this->currentIndex());
 }
-
-
-
-

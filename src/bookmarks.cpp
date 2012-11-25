@@ -25,62 +25,28 @@
 #include <QtGui>
 #include "bookmarkmodel.h"
 #include "icondlg.h"
-#include "mainwindow.h"
+#include "mainwindowfilemanager.h"
+#include "utils.h"
+#include "properties.h"
 
-//---------------------------------------------------------------------------
-void MainWindow::addBookmarkAction()
+void MainWindowFileManager::addBookmarkAction()
 {
     modelBookmarks->addBookmark(curIndex.fileName(),curIndex.filePath(),"0","");
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addSeparatorAction()
+void MainWindowFileManager::addSeparatorAction()
 {
     modelBookmarks->addBookmark("","","","");
 }
 
-//---------------------------------------------------------------------------
-bookmarkmodel::bookmarkmodel(QHash<QString,QIcon> * icons)
-{
-    folderIcons = icons;
-}
-
-//---------------------------------------------------------------------------
-void bookmarkmodel::addBookmark(QString name, QString path, QString isAuto, QString icon)
-{
-    if(path.isEmpty())	    //add seperator
-    {
-        QStandardItem *item = new QStandardItem(QIcon::fromTheme(icon),"");
-        item->setData(QBrush(QPixmap(":/images/sep.png")),Qt::BackgroundRole);
-        QFlags<Qt::ItemFlag> flags = item->flags();
-        flags ^= Qt::ItemIsEditable;                    //not editable
-        item->setFlags(flags);
-        item->setFont(QFont("sans",8));                 //force size to prevent 2 rows of background tiling
-        this->appendRow(item);
-        return;
-    }
-
-    QIcon theIcon;
-    theIcon = QIcon::fromTheme(icon,QApplication::style()->standardIcon(QStyle::SP_DirIcon));
-
-    if(icon.isEmpty()) if(folderIcons->contains(name)) theIcon = folderIcons->value(name);
-
-    if(name.isEmpty()) name = "/";
-    QStandardItem *item = new QStandardItem(theIcon,name);
-    item->setData(path,32);
-    item->setData(icon,33);
-    item->setData(isAuto,34);
-    this->appendRow(item);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::mountWatcherTriggered()
+void MainWindowFileManager::mountWatcherTriggered()
 {
     QTimer::singleShot(1000,this,SLOT(autoBookmarkMounts()));
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::autoBookmarkMounts()
+void MainWindowFileManager::autoBookmarkMounts()
 {
     QList<QStandardItem *> theBookmarks = modelBookmarks->findItems("*",Qt::MatchWildcard);
 
@@ -101,11 +67,11 @@ void MainWindow::autoBookmarkMounts()
     mtab.close();
 
     QStringList sysMounts = QStringList() << "/dev" << "/sys" << "/pro" << "/tmp" << "/run";
-    QStringList dontShowList = settings->value("hideBookmarks",0).toStringList();
+    QStringList dontShowList = Properties::Instance()->settings.value("hideBookmarks",0).toStringList();
     mounts.clear();
 
     foreach(QString item, mtabMounts)
-	if(!sysMounts.contains(item.split(" ").at(1).left(4)))
+    if(!sysMounts.contains(item.split(" ").at(1).left(4)))
         {
             QString path = item.split(" ").at(1);
             path.replace("\\040"," ");
@@ -114,7 +80,7 @@ void MainWindow::autoBookmarkMounts()
             if(!dontShowList.contains(path))
                 if(!autoBookmarks.contains(path))	    //add a new auto bookmark if it doesn't exist
                 {
-			autoBookmarks.append(path);
+            autoBookmarks.append(path);
                     if(item.split(" ").at(2) == "iso9660") modelBookmarks->addBookmark(path,path,"1","drive-optical");
                     else if(item.split(" ").at(2).contains("fat")) modelBookmarks->addBookmark(path,path,"1","drive-removable-media");
                     else modelBookmarks->addBookmark(path,path,"1","drive-harddisk");
@@ -129,31 +95,31 @@ void MainWindow::autoBookmarkMounts()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::delBookmark()
+void MainWindowFileManager::delBookmark()
 {
-    QModelIndexList list = bookmarksList->selectionModel()->selectedIndexes();
+    QModelIndexList list = listViewPlaces->selectionModel()->selectedIndexes();
 
     while(!list.isEmpty())
     {
         if(list.first().data(34).toString() == "1")		//automount, add to dontShowList
         {
-            QStringList temp = settings->value("hideBookmarks",0).toStringList();
+            QStringList temp = Properties::Instance()->hideBookmarks;
             temp.append(list.first().data(32).toString());
-            settings->setValue("hideBookmarks",temp);
+            Properties::Instance()->hideBookmarks = temp;
         }
         modelBookmarks->removeRow(list.first().row());
-        list = bookmarksList->selectionModel()->selectedIndexes();
+        list = listViewPlaces->selectionModel()->selectedIndexes();
     }
 
 }
 
 //---------------------------------------------------------------------------------
-void MainWindow::editBookmark()
+void MainWindowFileManager::editBookmark()
 {
     icondlg * themeIcons = new icondlg;
     if(themeIcons->exec() == 1)
     {
-        QStandardItem * item = modelBookmarks->itemFromIndex(bookmarksList->currentIndex());
+        QStandardItem * item = modelBookmarks->itemFromIndex(listViewPlaces->currentIndex());
         item->setData(themeIcons->result,33);
         item->setIcon(QIcon::fromTheme(themeIcons->result));
     }
@@ -161,70 +127,34 @@ void MainWindow::editBookmark()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::toggleWrapBookmarks()
+void MainWindowFileManager::toggleWrapBookmarks()
 {
-    bookmarksList->setWrapping(wrapBookmarksAct->isChecked());
-    settings->setValue("wrapBookmarks",wrapBookmarksAct->isChecked());
+    listViewPlaces->setWrapping(wrapBookmarksAct->isChecked());
+    Properties::Instance()->wrapBookmarks = wrapBookmarksAct->isChecked();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::bookmarkPressed(QModelIndex current)
+void MainWindowFileManager::bookmarkPressed(QModelIndex current)
 {
     if(QApplication::mouseButtons() == Qt::MidButton)
         tabs->setCurrentIndex(addTab(current.data(32).toString()));
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::bookmarkClicked(QModelIndex item)
+void MainWindowFileManager::bookmarkClicked(QModelIndex item)
 {
-    if(item.data(32).toString() == pathEdit->currentText()) return;
+    if(item.data(32).toString() == pathEdit->currentText())
+        return;
 
     QString info(item.data(32).toString());
-    if(info.isEmpty()) return;                                  //separator
-    if(info.contains("/.")) modelList->setRootPath(info);       //hidden folders
+    if(info.isEmpty())
+        return;                                  //separator
+    if(info.contains("/."))
+        modelList->setRootPath(info);       //hidden folders
 
-    tree->setCurrentIndex(modelTree->mapFromSource(modelList->index(item.data(32).toString())));
-    status->showMessage(getDriveInfo(curIndex.filePath()));
-}
-
-//---------------------------------------------------------------------------------
-QStringList bookmarkmodel::mimeTypes() const
-{
-    return QStringList() << "application/x-qstandarditemmodeldatalist" << "text/uri-list";
-}
-
-//---------------------------------------------------------------------------------
-bool bookmarkmodel::dropMimeData(const QMimeData * data,Qt::DropAction action,int row,int column,const QModelIndex & parent )
-{
-    //moving its own items around
-    if(data->hasFormat("application/x-qstandarditemmodeldatalist"))
-	if(parent.column() == -1)
-	    return QStandardItemModel::dropMimeData(data,action,row,column,parent);
-
-
-    QList<QUrl> files = data->urls();
-    QStringList cutList;
-
-    foreach(QUrl path, files)
-    {
-        QFileInfo file(path.toLocalFile());
-
-        //drag to bookmark window, add a new bookmark
-        if(parent.column() == -1)
-        {
-            if(file.isDir()) this->addBookmark(file.fileName(),file.filePath(),0,"");
-            return false;
-        }
-        else
-            if(action == 2)                             //cut
-                cutList.append(file.filePath());
-    }
-
-    emit bookmarkPaste(data, parent.data(32).toString(), cutList);
-
-    return false;
+    treeViewFileSystem->setCurrentIndex(
+                modelTree->mapFromSource(modelList->index(item.data(32).toString())));
+    labelStatus->setText(getDriveInfo(curIndex.filePath()));
 }
 
 #endif
-
-

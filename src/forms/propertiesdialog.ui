@@ -54,16 +54,6 @@
        <string>Emulation</string>
       </property>
      </item>
-     <item>
-      <property name="text">
-       <string>Shortcuts</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>DropDown</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="0" column="1">
@@ -72,7 +62,7 @@
       <enum>QFrame::Box</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="fontPage">
       <layout class="QGridLayout" name="gridLayout_2">

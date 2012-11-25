@@ -60,11 +60,6 @@ PropertiesDialog::PropertiesDialog(QWidget *parent)
     historyLimited->setChecked(Properties::Instance()->historyLimited);
     historyUnlimited->setChecked(!Properties::Instance()->historyLimited);
     historyLimitedTo->setValue(Properties::Instance()->historyLimitedTo);
-
-    dropShowOnStartCheckBox->setChecked(Properties::Instance()->dropShowOnStart);
-    dropHeightSpinBox->setValue(Properties::Instance()->dropHeight);
-    dropWidthSpinBox->setValue(Properties::Instance()->dropWidht);
-    dropShortCutEdit->setText(Properties::Instance()->dropShortCut.toString());
 }
 
 PropertiesDialog::~PropertiesDialog()
@@ -101,11 +96,6 @@ void PropertiesDialog::apply()
     saveShortcuts();
 
     Properties::Instance()->saveSettings();
-
-    Properties::Instance()->dropShowOnStart = dropShowOnStartCheckBox->isChecked();
-    Properties::Instance()->dropHeight = dropHeightSpinBox->value();
-    Properties::Instance()->dropWidht = dropWidthSpinBox->value();
-    Properties::Instance()->dropShortCut = QKeySequence(dropShortCutEdit->text());
 
     emit propertiesChanged();
 }
