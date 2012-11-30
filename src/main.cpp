@@ -1,4 +1,5 @@
 /****************************************************************************
+* Copyright (C) 2012 Francisco Ballina <zballinita@gmail.com>
 * This file is part of qtFM, a simple, fast file manager.
 * Copyright (C) 2010,2011,2012 Wittfella
 *
@@ -19,10 +20,15 @@
 *
 ****************************************************************************/
 
-#define NAME_SERVER "qtfilemanager"
-
-#include <QApplication>
 #include "mainwindowfilemanager.h"
+
+#include <QtGui/QApplication>
+#include <QtNetwork/QLocalServer>
+#include <QtNetwork/QLocalSocket>
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+
+#define NAME_SERVER "qtfilemanager"
 
 int main(int argc, char *argv[])
 {
@@ -38,7 +44,13 @@ int main(int argc, char *argv[])
             QLocalSocket client;
             client.connectToServer(NAME_SERVER);
             client.waitForConnected(1000);
-            if(client.state() != QLocalSocket::ConnectedState) QFile::remove(QDir::tempPath() + "/qtfilemanager");
+
+            if(client.state() != QLocalSocket::ConnectedState)
+            {
+                QFile::remove(QDir::tempPath()
+                              + QDir::separator()
+                              + NAME_SERVER);
+            }
             else
             {
                 client.close();
@@ -54,7 +66,9 @@ int main(int argc, char *argv[])
     app.setApplicationName(NAME_SERVER);
 
     QTranslator qtTranslator;
-    qtTranslator.load("qt_" + QLocale::system().name(),QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    qtTranslator.load("qt_" + QLocale::system().name(),
+                      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+
     app.installTranslator(&qtTranslator);
 
     QTranslator qtfmTranslator;
@@ -66,4 +80,3 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
-

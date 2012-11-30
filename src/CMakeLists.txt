@@ -16,35 +16,26 @@ set(QTFILEMANAGER_HEADERS
 set(QTFILEMANAGER_SOURCES
     main.cpp
     mainwindowfilemanager.cpp
-    customactions.cpp
     icondlg.cpp
-    progressdlg.cpp
     propertiesdialog.cpp
-    propertiesdlg.cpp
-    tabbar.cpp
     properties.cpp
-    mymodel.cpp
-    mymodelitem.cpp
     utils.cpp
-    bookmarkmodel.cpp
+    icons.cpp
+    viewcontent.cpp
+    thumbnailiconprovider.cpp
 )
 
 set(QTFILEMANAGER_MOC_SOURCES
     mainwindowfilemanager.h
-    bookmarkmodel.h
-    customactions.h
     icondlg.h
-    progressdlg.h
     propertiesdialog.h
-    propertiesdlg.h
-    tabbar.h
-    mymodel.h
-    bookmarkmodel.h
+    viewcontent.h
 )
 
 set(QTFILEMANAGER_UI_SOURCES
     forms/propertiesdialog.ui
     forms/mainwindowfilemanager.ui
+    forms/viewcontent.ui
 )
 
 set(QTFILEMANAGER_RCC_SRC
@@ -81,6 +72,7 @@ add_executable(${EXE_NAME}
 
 target_link_libraries(${EXE_NAME}
     magic
+    qtxdg
     ${QTERMWIDGET_LIBRARIES}
     ${QT_LIBRARIES}
     ${QT_QTCORE_LIBRARY}

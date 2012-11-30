@@ -58,7 +58,7 @@ myProgressDialog::myProgressDialog(QString title)
    //start the timer
    remainingTimer->start();
 
-   QTimer::singleShot(1000,this,SLOT(setShowing()));
+   QTimer::singleShot(1000, this, SLOT(setShowing()));
 }
 
 //---------------------------------------------------------------------------
@@ -89,11 +89,16 @@ void myProgressDialog::update(qint64 bytes, qint64 total, QString name)
 
         QString formattedTime;
 
-        if (currentSecondsRemaining < 60) formattedTime = QString("%1 seconds").arg(currentSecondsRemaining);
-        else formattedTime = QString("%1 min %2 sec").arg(currentSecondsRemaining / 60).arg(currentSecondsRemaining % 60);
+        if (currentSecondsRemaining < 60)
+            formattedTime = QString("%1 seconds").arg(currentSecondsRemaining);
+        else
+            formattedTime = QString("%1 min %2 sec").arg(
+                        currentSecondsRemaining / 60).arg(currentSecondsRemaining % 60);
 
-        transferInfo->setText(QString(tr("<p>Transfer rate: %2 MB/s<br>Time remaining: %3</p>"))
-                                   .arg(cumulativeTransferRateMB, 0, 'f', 1).arg(formattedTime));
+        transferInfo->setText(
+                    QString(tr("<p>Transfer rate: %2 MB/s<br>Time remaining: %3</p>"))
+                                   .arg(
+                        cumulativeTransferRateMB, 0, 'f', 1).arg(formattedTime));
 
         oldSeconds = currentSeconds;
     }

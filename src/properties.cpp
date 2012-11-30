@@ -33,12 +33,10 @@ Properties * Properties::Instance()
 
 Properties::Properties()
 {
-    qDebug("Properties constructor called");
 }
 
 Properties::~Properties()
 {
-    qDebug("Properties destructor called");
     saveSettings();
     delete m_instance;
     m_instance = 0;
@@ -56,6 +54,8 @@ QFont Properties::defaultFont()
 
 void Properties::loadSettings()
 {
+    QSettings settings;
+
     settings.beginGroup("File Manager");
     realMimeTypes = settings.value("realMimeTypes", true).toBool();
     forceTheme = settings.value("forceTheme", "oxygen").toString();
@@ -79,6 +79,10 @@ void Properties::loadSettings()
     appOpacity = settings.value("Opacity", 100).toInt();
     daemon = settings.value("daemon", false).toBool();
     startPath = settings.value("startPath", QDir::homePath()).toString();
+    settings.endGroup();
+
+    settings.beginGroup("Docks");
+    heightTerminal = settings.value("heightTerminal", 200).toInt();
     settings.endGroup();
 
     settings.beginGroup("Terminal");
@@ -120,6 +124,8 @@ void Properties::loadSettings()
 
 void Properties::saveSettings()
 {
+    QSettings settings;
+
     settings.beginGroup("File Manager");
     settings.setValue("realMimeTypes", realMimeTypes);
     settings.setValue("forceTheme", forceTheme);
@@ -143,6 +149,10 @@ void Properties::saveSettings()
     settings.setValue("Opacity", appOpacity);
     settings.setValue("daemon", daemon);
     settings.setValue("startPath", startPath);
+    settings.endGroup();
+
+    settings.beginGroup("Docks");
+    settings.setValue("heightTerminal", heightTerminal);
     settings.endGroup();
 
     settings.beginGroup("Terminal");

@@ -18,7 +18,6 @@ class Properties
         void saveSettings();
         void loadSettings();
         QFont defaultFont();
-        QSettings settings;
 
         // File manager
         QString forceTheme;
@@ -43,6 +42,9 @@ class Properties
         bool daemon;
         int appOpacity;
         QString startPath;
+
+        // Docks
+        int heightTerminal;
 
         // Bookmarks
         // Group and childkeys

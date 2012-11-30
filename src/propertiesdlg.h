@@ -25,7 +25,6 @@
 
 #include <QtGui>
 #include <QDialog>
-#include "mymodel.h"
 
 class propertiesDialog: public QDialog
 {
