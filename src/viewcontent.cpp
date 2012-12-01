@@ -4,13 +4,14 @@
 #include <QtCore/QDebug>
 #include <QtCore/QProcess>
 #include "properties.h"
+#include "utils.h"
 
 ViewContent::ViewContent(QString startpath, ThumbnailIconProvider *icons, QWidget *parent) :
     QWidget(parent), Ui::ViewContent(),
     m_model(new QFileSystemModel()), m_currentDir(startpath),
     m_iconProvider(icons),
     m_historyPrevious(new QStack<QString>()),
-    m_historyFollow(new QStack<QString>())
+    m_historyNext(new QStack<QString>())
 {
     setupUi(this);
 
@@ -32,7 +33,7 @@ ViewContent::ViewContent(QString startpath, ThumbnailIconProvider *icons, QWidge
 ViewContent::~ViewContent()
 {
     delete m_model;
-    delete m_historyFollow;
+    delete m_historyNext;
     delete m_historyPrevious;
 }
 
@@ -60,6 +61,11 @@ void ViewContent::connectClickedModelIndex()
 
 QString ViewContent::currentDir()
 {
+    return currentDirectory(QFileInfo(m_currentDir));
+}
+
+QString ViewContent::currentDirAbsolutePath()
+{
     return m_currentDir;
 }
 
@@ -69,7 +75,7 @@ void ViewContent::onView_changeDir(QString path)
     m_listView->setRootIndex(m_model->index(m_currentDir));
     m_treeView->setRootIndex(m_model->index(m_currentDir));
     m_tableView->setRootIndex(m_model->index(m_currentDir));
-    emit onChangeDir(m_currentDir);
+    emit onChangeDir(currentDirAbsolutePath());
 }
 
 void ViewContent::changeDir(QString path)
@@ -93,8 +99,17 @@ void ViewContent::previousDir()
 {
     if(!m_historyPrevious->isEmpty())
     {
-        m_historyFollow->push(m_historyPrevious->top());
-        emit onHistoryFollow(true);
+        qDebug() << m_currentDir << "invoke previous dir" << m_historyPrevious->top();
+        m_historyNext->push(m_historyPrevious->top());
+        if(m_historyPrevious->isEmpty())
+            emit onHistoryPrevious(false);
+        else if (m_historyPrevious->top() == m_currentDir)
+        {
+            m_historyPrevious->pop();
+            emit onHistoryPrevious(false);
+        }
+
+        emit onHistoryNext(true);
         m_model->setRootPath(m_historyPrevious->pop());
     }
     else
@@ -103,18 +118,32 @@ void ViewContent::previousDir()
     }
 }
 
-void ViewContent::followDir()
+bool ViewContent::hasPreviousDir()
 {
-    if(!m_historyFollow->isEmpty())
+    return !m_historyPrevious->isEmpty();
+}
+
+void ViewContent::nextDir()
+{
+    if(!m_historyNext->isEmpty())
     {
-        m_historyPrevious->push(m_historyFollow->top());
+        qDebug() << "invoke next dir" << m_historyNext->top();
+        m_historyPrevious->push(m_historyNext->top());
+        if(m_historyNext->isEmpty())
+            emit onHistoryNext(false);
+
         emit onHistoryPrevious(true);
-        m_model->setRootPath(m_historyFollow->pop());
+        m_model->setRootPath(m_historyNext->pop());
     }
     else
     {
-        emit onHistoryFollow(false);
+        emit onHistoryNext(false);
     }
+}
+
+bool ViewContent::hasNextDir()
+{
+    return !m_historyNext->isEmpty();
 }
 
 void ViewContent::onView_NClicked(const QModelIndex &index)

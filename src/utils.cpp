@@ -1,5 +1,6 @@
 #include "utils.h"
 
+#include <QtCore/QDir>
 #include <sys/vfs.h>
 #include <sys/stat.h>
 #include <magic.h>
@@ -49,3 +50,13 @@ QString formatSize(qint64 num)
     return total;
 }
 
+QString currentDirectory(QFileInfo path)
+{
+    if(path.absoluteFilePath() != "/")
+    {
+        QStringList split = path.absoluteFilePath().split(QDir::separator());
+        return split.at(split.size() - 1);
+    }
+
+    return path.absoluteFilePath();
+}

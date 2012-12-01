@@ -23,7 +23,6 @@ private:
 
     QHash<QString, QIcon> *mimeIcons;
     QHash<QString, QIcon> *folderIcons;
-    QCache<QString, QIcon> *icons;
 
     QHash<QString, QString> *mimeGlob;
     QHash<QString, QString> *mimeGeneric;

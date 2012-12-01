@@ -1,32 +1,68 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/back.png</file>
-        <file>images/bookmark.png</file>
-        <file>images/clear.png</file>
-        <file>images/copy.png</file>
-        <file>images/cut.png</file>
-        <file>images/delete.png</file>
-        <file>images/details.png</file>
         <file>images/document-new.png</file>
         <file>images/document-open.png</file>
-        <file>images/exit.png</file>
         <file>images/folder-new.png</file>
-        <file>images/hidden.png</file>
-        <file>images/home.png</file>
-        <file>images/icons.png</file>
-        <file>images/key_bindings.png</file>
-        <file>images/lock.png</file>
-        <file>images/paste.png</file>
-        <file>images/refresh.png</file>
-        <file>images/sep.png</file>
-        <file>images/up.png</file>
         <file>images/window-close.png</file>
         <file>images/zoom-in.png</file>
         <file>images/zoom-out.png</file>
         <file>images/preferences.png</file>
-        <file>images/properties.png</file>
-        <file>images/background.png</file>
         <file>images/system-file-manager.png</file>
-        <file>images/yakuake.png</file>
+        <file>images/dialog-close.png</file>
+        <file>images/document-decrypt.png</file>
+        <file>images/document-encrypt.png</file>
+        <file>images/drive-harddisk.png</file>
+        <file>images/drive-optical.png</file>
+        <file>images/drive-removable-media-usb-pendrive.png</file>
+        <file>images/drive-removable-media-usb.png</file>
+        <file>images/drive-removable-media.png</file>
+        <file>images/edit-clear.png</file>
+        <file>images/edit-copy.png</file>
+        <file>images/edit-cut.png</file>
+        <file>images/edit-delete.png</file>
+        <file>images/edit-paste.png</file>
+        <file>images/edit-rename.png</file>
+        <file>images/fileview-preview.png</file>
+        <file>images/folder-locked.png</file>
+        <file>images/folder-red.png</file>
+        <file>images/folder-remote.png</file>
+        <file>images/go-home.png</file>
+        <file>images/go-next.png</file>
+        <file>images/go-previous.png</file>
+        <file>images/go-up.png</file>
+        <file>images/help-about.png</file>
+        <file>images/media-flash-memory-stick.png</file>
+        <file>images/media-flash-sd-mmc.png</file>
+        <file>images/media-flash-smart-media.png</file>
+        <file>images/media-flash.png</file>
+        <file>images/media-optical-blu-ray.png</file>
+        <file>images/media-optical-dvd.png</file>
+        <file>images/media-optical-recordable.png</file>
+        <file>images/media-optical.png</file>
+        <file>images/phone.png</file>
+        <file>images/system-search.png</file>
+        <file>images/tab-close-other.png</file>
+        <file>images/tab-close.png</file>
+        <file>images/tab-duplicate.png</file>
+        <file>images/tab-new-background.png</file>
+        <file>images/tab-new.png</file>
+        <file>images/user-trash.png</file>
+        <file>images/view-list-details.png</file>
+        <file>images/view-list-icons.png</file>
+        <file>images/view-list-tree.png</file>
+        <file>images/view-preview.png</file>
+        <file>images/view-refresh.png</file>
+        <file>images/view-sort-ascending.png</file>
+        <file>images/view-sort-descending.png</file>
+        <file>images/window-duplicate.png</file>
+        <file>images/view-list-text.png</file>
+        <file>images/view-file-columns.png</file>
+        <file>images/configure-shortcuts.png</file>
+        <file>images/configure-toolbars.png</file>
+        <file>images/configure.png</file>
+        <file>images/layer-visible-off.png</file>
+        <file>images/layer-visible-on.png</file>
+        <file>images/show-menu.png</file>
+        <file>images/utilities-terminal.png</file>
     </qresource>
 </RCC>

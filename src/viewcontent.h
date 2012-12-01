@@ -17,15 +17,18 @@ public:
     ~ViewContent();
 
     QString currentDir();
+    QString currentDirAbsolutePath();
     void upDir();
     void previousDir();
-    void followDir();
+    void nextDir();
     void changeDir(QString path = QDir::homePath());
+    bool hasNextDir();
+    bool hasPreviousDir();
 
 signals:
     void onChangeDir(QString dir);
     void onHistoryPrevious(bool exist);
-    void onHistoryFollow(bool exist);
+    void onHistoryNext(bool exist);
 
 private slots:
     void onView_NClicked(const QModelIndex &index);
@@ -40,7 +43,7 @@ private:
     ThumbnailIconProvider *m_iconProvider;
     QString m_currentDir;
     QStack<QString> *m_historyPrevious;
-    QStack<QString> *m_historyFollow;
+    QStack<QString> *m_historyNext;
 };
 
 #endif // VIEWCONTENT_H

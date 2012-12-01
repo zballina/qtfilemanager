@@ -18,23 +18,18 @@
 #include <QtGui/QImageWriter>
 #include <QtCore/QDir>
 #include <qtxdg/xdgmime.h>
+#include <qtxdg/xdgicon.h>
 #include <magic.h>
 
 #define FILE_CACHE      "/.config/qtfilemanager/file.cache"
 #define FOLDER_CACHE    "/.config/qtfilemanager/folder.cache"
-#define THUMBS_CACHE    "/.config/qtfilemanager/thumbs.cache"
 
 Icons::Icons()
 {
     mimeIcons = new QHash<QString, QIcon>;
     folderIcons = new QHash<QString, QIcon>;
-    icons = new QCache<QString, QIcon>;
     mimeGeneric = new QHash<QString, QString>;
     mimeGlob = new QHash<QString, QString>;
-
-    icons->setMaxCost(500);
-
-    loadMimeTypes();
 
     QFile fileIcons(QDir::homePath() + FILE_CACHE);
     fileIcons.open(QIODevice::ReadOnly);
@@ -56,7 +51,7 @@ QString Icons::getMimeType(QString path)
     QString temp = magic_file(cookie, path.toLocal8Bit());
     magic_close(cookie);
 
-    qDebug() << "Magic" << temp;
+    qDebug() << path << "Magic" << temp;
 
     return temp.left(temp.indexOf(";"));
 }
@@ -120,7 +115,7 @@ void Icons::cacheInfo()
 
 QIcon Icons::icon(const QFileInfo &file)
 {
-    QIcon theIcon;
+    QIcon theIcon = QIcon::fromTheme("user-home");;
 
     if(file.isDir())
     {
@@ -130,7 +125,12 @@ QIcon Icons::icon(const QFileInfo &file)
         }
         else if(file.absoluteFilePath() == QDir::homePath())
         {
-            theIcon = QIcon::fromTheme("user-home");
+            folderIcons->insert(file.absoluteFilePath(), theIcon);
+            return theIcon;
+        }
+        if(file.isSymLink())
+        {
+            theIcon = QIcon::fromTheme("folder-grey", QIcon(":images/folder-grey"));
             folderIcons->insert(file.absoluteFilePath(), theIcon);
             return theIcon;
         }
@@ -140,59 +140,56 @@ QIcon Icons::icon(const QFileInfo &file)
 
         return iconFactory.icon(file);
     }
-    else
+    else if(file.suffix() > 0)
     {
-        if(icons->contains(file.absoluteFilePath()))
+        QString suffix = file.suffix().toLower();
+
+        if(mimeIcons->contains(suffix))
         {
-            return *icons->object(file.absoluteFilePath());
+            return mimeIcons->value(suffix);
         }
+        //try mimeType as it is
 
-        if(file.isExecutable())
+        if(mimeGlob->count() == 0)
+            loadMimeTypes();
+
+        QString mimeType = mimeGlob->value(suffix);
+        if(QIcon::hasThemeIcon(mimeType))
         {
-            QIcon *icon = new QIcon(QIcon::fromTheme("application-x-executable"));
-            icons->insert(file.absoluteFilePath(), icon, 1);
-            return *icon;
+            theIcon = QIcon::fromTheme(mimeType);
+            mimeIcons->insert(suffix, theIcon);
+            return theIcon;
         }
-
-        XdgMimeInfo mime(file);
-
-        if(mime.iconName() == "unknown" && file.absoluteFilePath().length() > 0)
+        else
         {
-            QString suffix = file.suffix();
-            if(mimeIcons->contains(suffix))
-                return mimeIcons->value(suffix);
-
-            if(suffix.isEmpty())
-            {
-                if(file.isExecutable())
-                    suffix = "exec";
-                else
-                    suffix = "none";
-
-                if(mimeIcons->contains(suffix))
-                    return mimeIcons->value(suffix);
-
-                theIcon = QIcon(qApp->style()->standardIcon(QStyle::SP_FileIcon));
-                if(suffix == "exec")
-                    theIcon = QIcon::fromTheme("application-x-executable", theIcon);
-            }
+            //try matching generic icon
+            if(QIcon::hasThemeIcon(mimeGeneric->value(mimeType)))
+                theIcon = QIcon::fromTheme(mimeGeneric->value(mimeType));
             else
             {
-                if(mimeGlob->count() == 0)
-                    loadMimeTypes();
-
-                //try mimeType as it is
-                QString mimeType = mimeGlob->value(file.suffix().toLower());
-                if(QIcon::hasThemeIcon(mimeType))
-                    theIcon = QIcon::fromTheme(mimeType);
+                //last resort try adding "-x-generic" to base type
+                if(QIcon::hasThemeIcon(mimeType.split("-").at(0) + "-x-generic"))
+                {
+                    theIcon = QIcon::fromTheme(mimeType.split("-").at(0) + "-x-generic");
+                    mimeIcons->insert(suffix, theIcon);
+                    return theIcon;
+                }
                 else
                 {
-                    //try matching generic icon
-                    if(QIcon::hasThemeIcon(mimeGeneric->value(mimeType)))
-                        theIcon = QIcon::fromTheme(mimeGeneric->value(mimeType));
+                    XdgMimeInfo mime = XdgMimeInfo(mimeType);
+                    if(mime.iconName() != "unknown")
+                    {
+                        mimeIcons->insert(suffix, mime.icon());
+                        return mime.icon();
+                    }
+                    mime = XdgMimeInfo(file);
+                    if(mime.iconName() != "unknown")
+                    {
+                        mimeIcons->insert(suffix, mime.icon());
+                        return mime.icon();
+                    }
                     else
                     {
-                        //last resort try adding "-x-generic" to base type
                         if(QIcon::hasThemeIcon(mimeType.split("-").at(0) + "-x-generic"))
                             theIcon = QIcon::fromTheme(mimeType.split("-").at(0) + "-x-generic");
                         else
@@ -200,14 +197,49 @@ QIcon Icons::icon(const QFileInfo &file)
                     }
                 }
             }
-
-            mimeIcons->insert(suffix, theIcon);
         }
-        else if(mime.iconName() != "unknown")
+
+        mimeIcons->insert(suffix, theIcon);
+    }
+    else if(file.isSymLink())
+    {
+        return icon(QFileInfo(file.symLinkTarget()));
+    }
+    else if(!file.isExecutable())
+    {
+        if(mimeIcons->contains(file.absoluteFilePath()))
         {
-            mimeIcons->insert(file.suffix(), mime.icon());
+            return mimeIcons->value(file.absoluteFilePath());
+        }
+
+        XdgMimeInfo mime = XdgMimeInfo(file);
+        if(mime.iconName() != "unknown")
+        {
+            mimeIcons->insert(file.absoluteFilePath(), mime.icon());
             return mime.icon();
         }
+        else
+        {
+            QString mimeType = getMimeType(file.absoluteFilePath());
+            if(QIcon::hasThemeIcon(mimeType))
+            {
+                theIcon = QIcon::fromTheme(mimeType);
+                mimeIcons->insert(file.absoluteFilePath(), theIcon);
+                return theIcon;
+            }
+            else if(QIcon::hasThemeIcon(mimeType.split("-").at(0) + "-x-generic"))
+            {
+                theIcon = QIcon::fromTheme(mimeType.split("-").at(0) + "-x-generic");
+                mimeIcons->insert(file.absoluteFilePath(), theIcon);
+                return XdgMimeInfo(file).icon();
+            }
+        }
     }
+    else if(file.isExecutable())
+    {
+        QIcon icon = QIcon::fromTheme("application-x-executable");
+         return icon;
+    }
+
     return theIcon;
 }

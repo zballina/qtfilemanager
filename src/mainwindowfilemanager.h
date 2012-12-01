@@ -4,6 +4,7 @@
 #include "ui_mainwindowfilemanager.h"
 #include <QtGui/QMainWindow>
 #include <QtGui/QFileSystemModel>
+#include "addressbar.h"
 #include "viewcontent.h"
 #include "icons.h"
 
@@ -16,13 +17,15 @@ public:
     ~MainWindowFileManager();
 
 private slots:
+    void onClickedDirectoryAddressBar(QFileInfo info);
     void onChangeDirCurrentView(QString dir);
-    void onDirPrevious(bool activate);
-    void onDirFollow(bool activate);
+    void onPreviousDir(bool activate);
+    void onNextDir(bool activate);
     void on_actionDetailsView_triggered();
     void on_actionAddTab_triggered();
+    void on_actionGoNextDir_triggered();
+    void on_actionGoPreviousDir_triggered();
     void on_actionGoHome_triggered();
-    void on_actionPreviosDir_triggered();
     void on_actionCloseTab_triggered();
     void on_actionUpDir_triggered();
     void on_actionTreeView_triggered();
@@ -30,12 +33,17 @@ private slots:
     void on_actionTerminal_triggered();
     void on_actionIconView_triggered();
     void on_actionListView_triggered();
+    void on_m_tabWidget_currentChanged(int index);
 
 private:
     void setPropertiesTerminal();
+    void setViewHideFile();
+    void setTheme();
+    void createAddressBar();
 
     ThumbnailIconProvider *m_iconProvider;
     Icons *m_icons;
+    AddressBar *m_addresBar;
 };
 
 #endif // MAINWINDOWFILEMANAGER_H

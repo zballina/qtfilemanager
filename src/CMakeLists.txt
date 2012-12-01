@@ -23,6 +23,8 @@ set(QTFILEMANAGER_SOURCES
     icons.cpp
     viewcontent.cpp
     thumbnailiconprovider.cpp
+    addressbar.cpp
+    addresspart.cpp
 )
 
 set(QTFILEMANAGER_MOC_SOURCES
@@ -30,12 +32,16 @@ set(QTFILEMANAGER_MOC_SOURCES
     icondlg.h
     propertiesdialog.h
     viewcontent.h
+    addressbar.h
+    addresspart.h
 )
 
 set(QTFILEMANAGER_UI_SOURCES
     forms/propertiesdialog.ui
     forms/mainwindowfilemanager.ui
     forms/viewcontent.ui
+    forms/addressbar.ui
+    forms/addresspart.ui
 )
 
 set(QTFILEMANAGER_RCC_SRC

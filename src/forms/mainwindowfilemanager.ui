@@ -173,6 +173,15 @@
    </attribute>
    <addaction name="actionAddTab"/>
    <addaction name="actionCloseTab"/>
+   <addaction name="separator"/>
+   <addaction name="actionIconView"/>
+   <addaction name="actionListView"/>
+   <addaction name="actionDetailsView"/>
+   <addaction name="actionTreeView"/>
+   <addaction name="separator"/>
+   <addaction name="actionViewHide"/>
+   <addaction name="actionZoomIn"/>
+   <addaction name="actionZoomOut"/>
   </widget>
   <widget class="QMenuBar" name="m_menuBar">
    <property name="geometry">
@@ -214,7 +223,7 @@
     <property name="title">
      <string>Go</string>
     </property>
-    <addaction name="actionGoPreviosDir"/>
+    <addaction name="actionGoPreviousDir"/>
     <addaction name="actionUpDir"/>
     <addaction name="separator"/>
     <addaction name="actionGoHome"/>
@@ -251,44 +260,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionGoPreviosDir"/>
-   <addaction name="actionGoFollowDir"/>
+   <addaction name="actionGoPreviousDir"/>
+   <addaction name="actionGoNextDir"/>
    <addaction name="actionUpDir"/>
    <addaction name="actionGoHome"/>
-  </widget>
-  <widget class="QToolBar" name="m_toolBarView">
-   <property name="windowTitle">
-    <string>View</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionIconView"/>
-   <addaction name="actionListView"/>
-   <addaction name="actionDetailsView"/>
-   <addaction name="actionTreeView"/>
-   <addaction name="actionViewHide"/>
-  </widget>
-  <widget class="QToolBar" name="m_toolBarZoom">
-   <property name="windowTitle">
-    <string>Zoom</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionZoomIn"/>
-   <addaction name="actionZoomOut"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionAddTab">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/document-open.png</normaloff>:/images/document-open.png</iconset>
+     <normaloff>:/images/tab-new.png</normaloff>:/images/tab-new.png</iconset>
    </property>
    <property name="text">
     <string>Add Tab</string>
@@ -303,7 +284,7 @@
   <action name="actionGoHome">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/home.png</normaloff>:/images/home.png</iconset>
+     <normaloff>:/images/go-home.png</normaloff>:/images/go-home.png</iconset>
    </property>
    <property name="text">
     <string>Go Home</string>
@@ -312,20 +293,29 @@
     <string>Ctrl+Home</string>
    </property>
   </action>
-  <action name="actionGoPreviosDir">
+  <action name="actionGoPreviousDir">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset theme="go-back" resource="../resources/resources.qrc">
-     <normaloff>:/images/back.png</normaloff>
-     <normalon>:/images/back.png</normalon>:/images/back.png</iconset>
+     <normaloff>:/images/go-previous.png</normaloff>
+     <normalon>:/images/back.png</normalon>:/images/go-previous.png</iconset>
    </property>
    <property name="text">
-    <string>Previos Dir</string>
+    <string>Previous Dir</string>
+   </property>
+   <property name="toolTip">
+    <string>Previous Dir</string>
+   </property>
+   <property name="shortcut">
+    <string>Backspace</string>
    </property>
   </action>
   <action name="actionCloseTab">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/window-close.png</normaloff>:/images/window-close.png</iconset>
+     <normaloff>:/images/tab-close.png</normaloff>:/images/tab-close.png</iconset>
    </property>
    <property name="text">
     <string>Close Tab</string>
@@ -337,7 +327,7 @@
   <action name="actionUpDir">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/up.png</normaloff>:/images/up.png</iconset>
+     <normaloff>:/images/go-up.png</normaloff>:/images/go-up.png</iconset>
    </property>
    <property name="text">
     <string>Up Dir</string>
@@ -349,7 +339,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/icons.png</normaloff>:/images/icons.png</iconset>
+     <normaloff>:/images/view-list-details.png</normaloff>:/images/view-list-details.png</iconset>
    </property>
    <property name="text">
     <string>List view</string>
@@ -364,7 +354,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/bookmark.png</normaloff>:/images/bookmark.png</iconset>
+     <normaloff>:/images/view-list-tree.png</normaloff>:/images/view-list-tree.png</iconset>
    </property>
    <property name="text">
     <string>Tree view</string>
@@ -376,7 +366,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/details.png</normaloff>:/images/details.png</iconset>
+     <normaloff>:/images/view-file-columns.png</normaloff>:/images/view-file-columns.png</iconset>
    </property>
    <property name="text">
     <string>Details view</string>
@@ -415,7 +405,7 @@
   <action name="actionViewHide">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/hidden.png</normaloff>:/images/hidden.png</iconset>
+     <normaloff>:/images/layer-visible-on.png</normaloff>:/images/layer-visible-on.png</iconset>
    </property>
    <property name="text">
     <string>View hide</string>
@@ -460,7 +450,7 @@
   <action name="actionTerminal">
    <property name="icon">
     <iconset theme="utilities-terminal" resource="../resources/resources.qrc">
-     <normaloff>:/images/yakuake.png</normaloff>:/images/yakuake.png</iconset>
+     <normaloff>:/images/utilities-terminal.png</normaloff>:/images/utilities-terminal.png</iconset>
    </property>
    <property name="text">
     <string>Terminal</string>
@@ -498,7 +488,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/system-file-manager.png</normaloff>:/images/system-file-manager.png</iconset>
+     <normaloff>:/images/help-about.png</normaloff>:/images/help-about.png</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -513,7 +503,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/icons.png</normaloff>:/images/icons.png</iconset>
+     <normaloff>:/images/view-list-icons.png</normaloff>:/images/view-list-icons.png</iconset>
    </property>
    <property name="text">
     <string>Icon view</string>
@@ -522,16 +512,22 @@
     <string>Icon view</string>
    </property>
   </action>
-  <action name="actionGoFollowDir">
+  <action name="actionGoNextDir">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/images/clear.png</normaloff>:/images/clear.png</iconset>
+     <normaloff>:/images/go-next.png</normaloff>:/images/go-next.png</iconset>
    </property>
    <property name="text">
-    <string>Go follow dir</string>
+    <string>Go next dir</string>
+   </property>
+   <property name="iconText">
+    <string>Go next dir</string>
    </property>
    <property name="toolTip">
-    <string>Go follow dir</string>
+    <string>Go next dir</string>
    </property>
   </action>
  </widget>
