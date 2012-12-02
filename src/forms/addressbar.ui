@@ -10,7 +10,14 @@
     <height>16</height>
    </rect>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout"/>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+  </layout>
  </widget>
  <resources/>
  <connections/>

@@ -4,6 +4,7 @@
 #include <QtGui/QWidget>
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileSystemModel>
+#include <QtGui/QScrollArea>
 #include <QtCore/QList>
 #include "addresspart.h"
 
@@ -31,6 +32,9 @@ private:
     QList<AddressPart *> m_children;
     QFileInfo m_file;
     QSpacerItem *m_spacer;
+    QScrollArea *m_scrollArea;
+    QWidget *m_scrollAreaWidgetContents;
+    QHBoxLayout *m_horizontalLayout;
 };
 
 #endif // ADDRESSBAR_H

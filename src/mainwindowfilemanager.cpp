@@ -33,8 +33,8 @@ MainWindowFileManager::~MainWindowFileManager()
 {
     Properties::Instance()->saveSettings();
     m_icons->cacheInfo();
-    delete m_icons;
     delete m_iconProvider;
+    delete m_icons;
     delete m_addresBar;
 }
 
