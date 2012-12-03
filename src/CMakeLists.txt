@@ -25,6 +25,7 @@ set(QTFILEMANAGER_SOURCES
     thumbnailiconprovider.cpp
     addressbar.cpp
     addresspart.cpp
+    filesystemmanager.cpp
 )
 
 set(QTFILEMANAGER_MOC_SOURCES
@@ -34,6 +35,7 @@ set(QTFILEMANAGER_MOC_SOURCES
     viewcontent.h
     addressbar.h
     addresspart.h
+    filesystemmanager.h
 )
 
 set(QTFILEMANAGER_UI_SOURCES

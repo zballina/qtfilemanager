@@ -10,6 +10,7 @@ AddressBar::AddressBar(QFileInfo file, QWidget *parent) :
 {
     setupUi(this);
     m_scrollArea = new QScrollArea(this);
+    m_scrollArea->resize(16, 16);
     m_scrollArea->setFrameShape(QFrame::NoFrame);
     m_scrollArea->setFrameShadow(QFrame::Plain);
     m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -87,29 +88,3 @@ void AddressBar::onClickPart(QFileInfo info)
     qDebug() << "In AddressBar" << info.absoluteFilePath();
     emit onClickDirectory(info);
 }
-
-
-/*
-scrollArea = new QScrollArea(AddressBar);
-scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
-QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-sizePolicy.setHorizontalStretch(0);
-sizePolicy.setVerticalStretch(0);
-sizePolicy.setHeightForWidth(scrollArea->sizePolicy().hasHeightForWidth());
-scrollArea->setSizePolicy(sizePolicy);
-scrollArea->setFrameShape(QFrame::NoFrame);
-scrollArea->setFrameShadow(QFrame::Plain);
-scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-scrollArea->setWidgetResizable(true);
-scrollArea->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-scrollAreaWidgetContents = new QWidget();
-scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-scrollAreaWidgetContents->setGeometry(QRect(0, 0, 72, 72));
-horizontalLayout = new QHBoxLayout(scrollAreaWidgetContents);
-horizontalLayout->setContentsMargins(0, 0, 0, 0);
-horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-scrollArea->setWidget(scrollAreaWidgetContents);
-
-verticalLayout->addWidget(scrollArea);
-*/
