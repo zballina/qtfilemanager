@@ -35,6 +35,8 @@ private slots:
     void on_actionListView_triggered();
     void on_m_tabWidget_currentChanged(int index);
 
+    void on_actionViewHide_triggered();
+
 private:
     void setPropertiesTerminal();
     void setViewHideFile();

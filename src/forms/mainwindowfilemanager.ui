@@ -410,6 +410,9 @@
    </property>
   </action>
   <action name="actionViewHide">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
      <normaloff>:/images/layer-visible-on.png</normaloff>:/images/layer-visible-on.png</iconset>

@@ -23,7 +23,8 @@ bool FileSystemManager::copyFolder(QString source, QString target, qint64 total,
 
     targetFolder = QDir(target);
 
-    QStringList files = sourceFolder.entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden);
+    QStringList files = sourceFolder.entryList(QDir::Files
+                                               | QDir::NoDotAndDotDot | QDir::Hidden);
 
     for(int i = 0; i < files.count(); i++)
     {

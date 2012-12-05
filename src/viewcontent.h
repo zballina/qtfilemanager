@@ -24,6 +24,7 @@ public:
     void changeDir(QString path = QDir::homePath());
     bool hasNextDir();
     bool hasPreviousDir();
+    void hide(bool view);
 
 signals:
     void onChangeDir(QString dir);

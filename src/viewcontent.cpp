@@ -175,3 +175,11 @@ void ViewContent::openFile(QModelIndex index)
     QProcess *process = new QProcess;
     process->start("xdg-open", QStringList() << m_model->fileInfo(index).absoluteFilePath());
 }
+
+void ViewContent::hide(bool view)
+{
+    if(view)
+        m_model->setFilter(QDir::AllDirs | QDir::AllEntries | QDir::Hidden);
+    else
+        m_model->setFilter(QDir::AllDirs | QDir::AllEntries);
+}

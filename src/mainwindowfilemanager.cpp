@@ -292,3 +292,9 @@ void MainWindowFileManager::on_m_tabWidget_currentChanged(int index)
     actionGoNextDir->setEnabled(current->hasNextDir());
     actionGoPreviousDir->setEnabled(current->hasPreviousDir());
 }
+
+void MainWindowFileManager::on_actionViewHide_triggered()
+{
+    ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
+    current->hide(actionViewHide->isChecked());
+}
