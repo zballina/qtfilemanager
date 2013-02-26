@@ -5,25 +5,14 @@
 
 AddressBar::AddressBar(QFileInfo file, QWidget *parent) :
     QWidget(parent),
-    Ui::AddressBar(), m_file(file), m_children(),
-    m_spacer(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum))
+    m_file(file), m_children(),
+    m_spacer(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum)),
+    m_horizontalLayout(new QHBoxLayout(this))
 {
-    setupUi(this);
-    m_scrollArea = new QScrollArea(this);
-    m_scrollArea->resize(16, 16);
-    m_scrollArea->setFrameShape(QFrame::NoFrame);
-    m_scrollArea->setFrameShadow(QFrame::Plain);
-    m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_scrollArea->setWidgetResizable(true);
-    m_scrollArea->setAlignment(Qt::AlignRight);
-    m_scrollAreaWidgetContents = new QWidget();
-
-    m_horizontalLayout = new QHBoxLayout(m_scrollAreaWidgetContents);
+    resize(16, 16);
+    setLayoutDirection(Qt::LeftToRight);
     m_horizontalLayout->setContentsMargins(0, 0, 0, 0);
-    m_scrollArea->setWidget(m_scrollAreaWidgetContents);
 
-    verticalLayout->addWidget(m_scrollArea);
     addPart();
 }
 
@@ -32,8 +21,6 @@ AddressBar::~AddressBar()
     removeParts();
     delete m_spacer;
     delete m_horizontalLayout;
-    delete m_scrollAreaWidgetContents;
-    delete m_scrollArea;
 }
 
 void AddressBar::changeAddress(QFileInfo file)
@@ -46,7 +33,14 @@ void AddressBar::addPart()
 {
     removeParts();
 
+    qDebug() << m_file.absoluteFilePath();
+    qDebug() << parentWidget()->geometry()
+             << parentWidget()->width() / 2
+             << this->geometry()
+             << m_file.absoluteFilePath().length();
+
     AddressPart *child;
+
     if(!m_file.isRoot())
     {
         QStringList path = m_file.absoluteFilePath().split(QDir::separator());
@@ -61,6 +55,7 @@ void AddressBar::addPart()
             child = new AddressPart(QFileInfo(fullpath), this);
             connect(child, SIGNAL(onClickPart(QFileInfo)), this, SLOT(onClickPart(QFileInfo)));
             m_horizontalLayout->addWidget(child);
+            qDebug() << i << child->geometry();
             m_children.push_back(child);
         }
     }
@@ -69,9 +64,15 @@ void AddressBar::addPart()
         child = new AddressPart(m_file, this);
         connect(child, SIGNAL(onClickPart(QFileInfo)), this, SLOT(onClickPart(QFileInfo)));
         m_horizontalLayout->addWidget(child);
+        qDebug() << child->geometry();
         m_children.push_back(child);
     }
     m_horizontalLayout->addItem(m_spacer);
+
+    qDebug() << parentWidget()->geometry()
+             << parentWidget()->width() / 2
+             << this->geometry()
+             << m_file.absoluteFilePath().length();
 }
 
 void AddressBar::removeParts()

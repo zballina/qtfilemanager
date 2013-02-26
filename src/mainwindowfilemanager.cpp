@@ -7,9 +7,7 @@
 #include "properties.h"
 #include "utils.h"
 
-#define INDEX_LISTVIEW      0
-#define INDEX_TREEVIEW      1
-#define INDEX_TABLEVIEW     2
+#include <QtCore/QDebug>
 
 MainWindowFileManager::MainWindowFileManager(QWidget *parent) :
     QMainWindow(parent), Ui::MainWindowFileManager()
@@ -23,8 +21,9 @@ MainWindowFileManager::MainWindowFileManager(QWidget *parent) :
 
     m_icons = new Icons();
     m_iconProvider = new ThumbnailIconProvider(m_icons);
+
     setPropertiesTerminal();
-    createAddressBar();
+    createPlaces();
     // Creation and open tab initial
     on_actionAddTab_triggered();
 }
@@ -35,13 +34,14 @@ MainWindowFileManager::~MainWindowFileManager()
     m_icons->cacheInfo();
     delete m_iconProvider;
     delete m_icons;
-    delete m_addresBar;
+    delete m_places;
 }
 
 void MainWindowFileManager::setTheme()
 {
-    QString temp = Properties::Instance()->forceTheme;
-    if(temp.isNull())
+    QString temp;
+
+    if(!Properties::Instance()->forceTheme)
     {
         //get theme from system (works for gnome/kde)
         temp = QIcon::themeName();
@@ -51,7 +51,7 @@ void MainWindowFileManager::setTheme()
 
         if(temp == "hicolor")
         {
-            //check for gtk-2.0 settings
+            //check for gtk-2.0 settings x11-wm/enlightenment
             if(QFile::exists(QDir::homePath() + "/" + ".gtkrc-2.0"))
             {
                 QSettings gtkFile(QDir::homePath() + "/.gtkrc-2.0", QSettings::IniFormat, this);
@@ -65,7 +65,7 @@ void MainWindowFileManager::setTheme()
                 temp = gtkFile.value("gtk-fallback-icon-theme").toString().remove("\"");
             }
 
-            //fallback
+            //fallb x11-wm/enlightenmentack
             if(temp.isNull())
             {
                 if(QFile::exists("/usr/share/icons/gnome"))
@@ -75,9 +75,14 @@ void MainWindowFileManager::setTheme()
                 else
                     temp = "hicolor";
 
-                Properties::Instance()->forceTheme = temp;
             }
         }
+        qDebug() << "Theme" << temp;
+    }
+    else
+    {
+        qDebug() << "Theme force" << temp;
+        temp = Properties::Instance()->theme;
     }
 
     XdgIcon::setThemeName(temp);
@@ -118,19 +123,10 @@ void MainWindowFileManager::setPropertiesTerminal()
     }
 }
 
-void MainWindowFileManager::createAddressBar()
+void MainWindowFileManager::createPlaces()
 {
-    m_addresBar = new AddressBar(QFileInfo(Properties::Instance()->startPath), this);
-    connect(m_addresBar, SIGNAL(onClickDirectory(QFileInfo)),
-            this, SLOT(onClickedDirectoryAddressBar(QFileInfo)));
-    m_toolBarNavigation->addWidget(m_addresBar);
-}
-
-void MainWindowFileManager::onClickedDirectoryAddressBar(QFileInfo info)
-{
-    qDebug() << "In MainWindowFileManager";
-    ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
-    current->changeDir(info.absoluteFilePath());
+    m_places = new Places(m_toolBarNavigation);
+    verticalLayoutPlaces->addWidget(m_places);
 }
 
 void MainWindowFileManager::on_actionAddTab_triggered()
@@ -147,6 +143,34 @@ void MainWindowFileManager::on_actionAddTab_triggered()
 
     m_tabWidget->setCurrentIndex(newtab);
     m_termWidgetTerminal->changeDir(view->currentDirAbsolutePath());
+    view->setMode((ViewContent::Mode) Properties::Instance()->viewMode);
+    switch((ViewContent::Mode) Properties::Instance()->viewMode)
+    {
+    case ViewContent::IconsView:
+        actionIconView->setChecked(true);
+        actionListView->setChecked(false);
+        actionTreeView->setChecked(false);
+        actionDetailsView->setChecked(false);
+        break;
+    case ViewContent::ListView:
+        actionListView->setChecked(true);
+        actionIconView->setChecked(false);
+        actionTreeView->setChecked(false);
+        actionDetailsView->setChecked(false);
+        break;
+    case ViewContent::DetailsView:
+        actionDetailsView->setChecked(true);
+        actionIconView->setChecked(false);
+        actionListView->setChecked(false);
+        actionTreeView->setChecked(false);
+        break;
+    case ViewContent::TreeView:
+        actionTreeView->setChecked(true);
+        actionIconView->setChecked(false);
+        actionListView->setChecked(false);
+        actionDetailsView->setChecked(false);
+        break;
+    }
 }
 
 void MainWindowFileManager::onChangeDirCurrentView(QString dir)
@@ -159,7 +183,6 @@ void MainWindowFileManager::onChangeDirCurrentView(QString dir)
     {
         actionUpDir->setEnabled(true);
     }
-    m_addresBar->changeAddress(dir);
     m_tabWidget->setTabText(m_tabWidget->currentIndex(), currentDirectory(QFileInfo(dir)));
     m_termWidgetTerminal->changeDir(QString("'%1'").arg(dir));
 }
@@ -179,8 +202,7 @@ void MainWindowFileManager::on_actionIconView_triggered()
     if(actionIconView->isChecked())
     {
         ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
-        current->stackedWidget->setCurrentIndex(INDEX_LISTVIEW);
-        current->m_listView->setViewMode(QListView::IconMode);
+        current->setMode(ViewContent::IconsView);
     }
     else
     {
@@ -196,8 +218,7 @@ void MainWindowFileManager::on_actionListView_triggered()
     if(actionListView->isChecked())
     {
         ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
-        current->stackedWidget->setCurrentIndex(INDEX_LISTVIEW);
-        current->m_listView->setViewMode(QListView::ListMode);
+        current->setMode(ViewContent::ListView);
     }
     else
     {
@@ -213,7 +234,7 @@ void MainWindowFileManager::on_actionTreeView_triggered()
     if(actionTreeView->isChecked())
     {
         ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
-        current->stackedWidget->setCurrentIndex(INDEX_TREEVIEW);
+        current->setMode(ViewContent::TreeView);
     }
     else
     {
@@ -229,7 +250,7 @@ void MainWindowFileManager::on_actionDetailsView_triggered()
     if(actionDetailsView->isChecked())
     {
         ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
-        current->stackedWidget->setCurrentIndex(INDEX_TABLEVIEW);
+        current->setMode(ViewContent::DetailsView);
     }
     else
     {
@@ -262,10 +283,15 @@ void MainWindowFileManager::on_actionGoNextDir_triggered()
 
 void MainWindowFileManager::on_actionCloseTab_triggered()
 {
-    int index = m_tabWidget->currentIndex();
-    ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
-    delete current;
-    m_tabWidget->removeTab(index);
+    if(m_tabWidget->currentIndex() > 0)
+    {
+        int index = m_tabWidget->currentIndex();
+        ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
+        delete current;
+        m_tabWidget->removeTab(index);
+    }
+    else
+        close();
 }
 
 void MainWindowFileManager::on_actionUpDir_triggered()
@@ -283,6 +309,8 @@ void MainWindowFileManager::on_m_tabWidget_tabCloseRequested(int index)
 
 void MainWindowFileManager::on_actionTerminal_triggered()
 {
+    //ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->widget(index));
+    //m_termWidgetTerminal->setWorkingDirectory(current->currentDir());
     m_dockWidgetTerminal->setVisible(!m_dockWidgetTerminal->isVisible());
 }
 
@@ -297,4 +325,10 @@ void MainWindowFileManager::on_actionViewHide_triggered()
 {
     ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
     current->hide(actionViewHide->isChecked());
+}
+
+void MainWindowFileManager::on_actionRefresh_triggered()
+{
+    ViewContent *current = qobject_cast<ViewContent *> (m_tabWidget->currentWidget());
+    current->update();
 }

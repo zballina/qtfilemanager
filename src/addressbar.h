@@ -5,12 +5,11 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileSystemModel>
 #include <QtGui/QScrollArea>
+#include <QtGui/QHBoxLayout>
 #include <QtCore/QList>
 #include "addresspart.h"
 
-#include "ui_addressbar.h"
-
-class AddressBar : public QWidget, public Ui::AddressBar
+class AddressBar : public QWidget
 {
     Q_OBJECT
 
@@ -29,12 +28,10 @@ private:
     void removeParts();
     void addPart();
 
+    QHBoxLayout *m_horizontalLayout;
     QList<AddressPart *> m_children;
     QFileInfo m_file;
     QSpacerItem *m_spacer;
-    QScrollArea *m_scrollArea;
-    QWidget *m_scrollAreaWidgetContents;
-    QHBoxLayout *m_horizontalLayout;
 };
 
 #endif // ADDRESSBAR_H

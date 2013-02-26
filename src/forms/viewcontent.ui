@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>396</width>
+    <height>296</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageListview">
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -32,14 +32,20 @@
          <property name="editTriggers">
           <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
          </property>
+         <property name="dragEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="defaultDropAction">
+          <enum>Qt::MoveAction</enum>
+         </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
          <property name="textElideMode">
-          <enum>Qt::ElideRight</enum>
+          <enum>Qt::ElideNone</enum>
          </property>
          <property name="movement">
-          <enum>QListView::Snap</enum>
+          <enum>QListView::Free</enum>
          </property>
          <property name="isWrapping" stdset="0">
           <bool>true</bool>
@@ -51,8 +57,28 @@
           <enum>QListView::Batched</enum>
          </property>
          <property name="spacing">
-          <number>12</number>
+          <number>7</number>
          </property>
+         <property name="viewMode">
+          <enum>QListView::ListMode</enum>
+         </property>
+         <property name="uniformItemSizes">
+          <bool>true</bool>
+         </property>
+         <property name="wordWrap">
+          <bool>false</bool>
+         </property>
+         <property name="selectionRectVisible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageIconView">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QListView" name="m_iconView">
          <property name="viewMode">
           <enum>QListView::IconMode</enum>
          </property>

@@ -19,7 +19,6 @@
 *
 ****************************************************************************/
 
-
 #include "icondlg.h"
 
 //---------------------------------------------------------------------------
@@ -43,7 +42,7 @@ icondlg::icondlg()
 
     QSettings inherits("/usr/share/icons/" + QIcon::themeName() + "/index.theme",QSettings::IniFormat,this);
     foreach(QString theme, inherits.value("Icon Theme/Inherits").toStringList())
-	themes.prepend(theme);
+    themes.prepend(theme);
     themes.append(QIcon::themeName());
 
     thread.setFuture(QtConcurrent::run(this,&icondlg::scanTheme));

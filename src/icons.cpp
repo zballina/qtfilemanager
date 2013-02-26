@@ -128,12 +128,6 @@ QIcon Icons::icon(const QFileInfo &file)
             folderIcons->insert(file.absoluteFilePath(), theIcon);
             return theIcon;
         }
-        if(file.isSymLink())
-        {
-            theIcon = QIcon::fromTheme("folder-grey", QIcon(":images/folder-grey"));
-            folderIcons->insert(file.absoluteFilePath(), theIcon);
-            return theIcon;
-        }
 
         QFileIconProvider iconFactory;
         folderIcons->insert(file.absoluteFilePath(), iconFactory.icon(file));
@@ -176,6 +170,7 @@ QIcon Icons::icon(const QFileInfo &file)
                 }
                 else
                 {
+                    /*
                     XdgMimeInfo mime = XdgMimeInfo(mimeType);
                     if(mime.iconName() != "unknown")
                     {
@@ -195,6 +190,7 @@ QIcon Icons::icon(const QFileInfo &file)
                         else
                             theIcon = QIcon(qApp->style()->standardIcon(QStyle::SP_FileIcon));
                     }
+                    */
                 }
             }
         }

@@ -58,7 +58,8 @@ void Properties::loadSettings()
 
     settings.beginGroup("File Manager");
     realMimeTypes = settings.value("realMimeTypes", true).toBool();
-    forceTheme = settings.value("forceTheme", "oxygen").toString();
+    forceTheme = settings.value("forceTheme", false).toBool();
+    theme = settings.value("theme").toString();
     windowState = settings.value("windowState").toByteArray();
     windowSize = settings.value("size", QSize(600, 400)).toSize();
     wrapBookmarks = settings.value("wrapBookmarks", false).toBool();
@@ -68,8 +69,7 @@ void Properties::loadSettings()
     zoomList = settings.value("zoomList",24).toInt();
     zoomDetail = settings.value("zoomDetail",16).toInt();
     showThumbs = settings.value("showThumbs", true).toBool();
-    viewMode = settings.value("viewMode", false).toBool();
-    iconMode = settings.value("iconMode", false).toBool();
+    viewMode = settings.value("viewMode", 0).toInt();
     hiddenMode = settings.value("hiddenMode", false).toBool();
     header = settings.value("header").toByteArray();
     singleClick = settings.value("singleClick", false).toBool();
@@ -101,6 +101,7 @@ void Properties::loadSettings()
         QString name(settings.value("name").toString());
         if (name.isEmpty())
             continue;
+
         sessions[name] = settings.value("state").toByteArray();
     }
     settings.endArray();
@@ -139,7 +140,6 @@ void Properties::saveSettings()
     settings.setValue("zoomDetail", zoomDetail);
     settings.setValue("showThumbs", showThumbs);
     settings.setValue("viewMode", viewMode);
-    settings.setValue("iconMode", iconMode);
     settings.setValue("hiddenMode", hiddenMode);
     settings.setValue("header", header);
     settings.setValue("singleClick", singleClick);

@@ -5,6 +5,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QFileSystemModel>
 #include "addressbar.h"
+#include "places.h"
 #include "viewcontent.h"
 #include "icons.h"
 
@@ -17,7 +18,6 @@ public:
     ~MainWindowFileManager();
 
 private slots:
-    void onClickedDirectoryAddressBar(QFileInfo info);
     void onChangeDirCurrentView(QString dir);
     void onPreviousDir(bool activate);
     void onNextDir(bool activate);
@@ -34,18 +34,18 @@ private slots:
     void on_actionIconView_triggered();
     void on_actionListView_triggered();
     void on_m_tabWidget_currentChanged(int index);
-
     void on_actionViewHide_triggered();
+    void on_actionRefresh_triggered();
 
 private:
     void setPropertiesTerminal();
     void setViewHideFile();
     void setTheme();
-    void createAddressBar();
+    void createPlaces();
 
     ThumbnailIconProvider *m_iconProvider;
     Icons *m_icons;
-    AddressBar *m_addresBar;
+    Places *m_places;
 };
 
 #endif // MAINWINDOWFILEMANAGER_H

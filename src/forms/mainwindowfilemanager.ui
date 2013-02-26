@@ -89,10 +89,13 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+   <widget class="QWidget" name="dockWidgetContentsPlaces">
+    <layout class="QVBoxLayout" name="verticalLayoutPlaces">
+     <property name="margin">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QListView" name="m_listViewPlaces"/>
+      <layout class="QVBoxLayout" name="verticalLayout_3"/>
      </item>
     </layout>
    </widget>
@@ -116,8 +119,8 @@
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_6">
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+   <widget class="QWidget" name="dockWidgetContentsTerminal">
+    <layout class="QVBoxLayout" name="verticalLayoutTerminal">
      <item>
       <widget class="QTermWidget" name="m_termWidgetTerminal">
        <property name="toolTip">
@@ -138,8 +141,8 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_9">
-    <layout class="QVBoxLayout" name="verticalLayout_5">
+   <widget class="QWidget" name="dockWidgetContentsFolders">
+    <layout class="QVBoxLayout" name="verticalLayoutFolders">
      <item>
       <widget class="QTreeView" name="m_treeViewFolders"/>
      </item>
@@ -153,8 +156,8 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_10">
-    <layout class="QVBoxLayout" name="verticalLayout_6">
+   <widget class="QWidget" name="dockWidgetContentsPreview">
+    <layout class="QVBoxLayout" name="verticalLayoutPreview">
      <item>
       <widget class="QGraphicsView" name="m_graphicsView"/>
      </item>
@@ -271,6 +274,7 @@
    <addaction name="actionGoNextDir"/>
    <addaction name="actionUpDir"/>
    <addaction name="actionGoHome"/>
+   <addaction name="actionRefresh"/>
    <addaction name="separator"/>
   </widget>
   <action name="actionAddTab">
@@ -583,6 +587,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/images/view-refresh.png</normaloff>:/images/view-refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
  </widget>

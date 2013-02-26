@@ -13,7 +13,10 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
+  <layout class="QHBoxLayout" name="m_horizontalLayout">
    <property name="margin">
     <number>0</number>
    </property>

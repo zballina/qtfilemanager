@@ -1,19 +1,29 @@
 #include "viewcontent.h"
 
-#include <QtGui/QFileSystemModel>
 #include <QtCore/QDebug>
 #include <QtCore/QProcess>
+#include <QtGui/QItemSelectionModel>
 #include "properties.h"
 #include "utils.h"
 
+#define INDEX_LISTVIEW      0
+#define INDEX_ICONVIEW      1
+#define INDEX_TREEVIEW      2
+#define INDEX_TABLEVIEW     3
+
 ViewContent::ViewContent(QString startpath, ThumbnailIconProvider *icons, QWidget *parent) :
     QWidget(parent), Ui::ViewContent(),
-    m_model(new QFileSystemModel()), m_currentDir(startpath),
+    m_model(new FileSystemModel()), m_currentDir(startpath),
     m_iconProvider(icons),
     m_historyPrevious(new QStack<QString>()),
     m_historyNext(new QStack<QString>())
 {
     setupUi(this);
+
+    m_addresBar = new AddressBar(QFileInfo(m_currentDir), this);
+    verticalLayout->insertWidget(0, m_addresBar);
+    connect(m_addresBar, SIGNAL(onClickDirectory(QFileInfo)),
+            this, SLOT(onClickedDirectoryAddressBar(QFileInfo)));
 
     m_model->setIconProvider(m_iconProvider);
     connect(m_model, SIGNAL(rootPathChanged(QString)),
@@ -22,6 +32,7 @@ ViewContent::ViewContent(QString startpath, ThumbnailIconProvider *icons, QWidge
     m_model->setResolveSymlinks(true);
 
     m_listView->setModel(m_model);
+    m_iconView->setModel(m_model);
     m_treeView->setModel(m_model);
     m_tableView->setModel(m_model);
 
@@ -37,11 +48,18 @@ ViewContent::~ViewContent()
     delete m_historyPrevious;
 }
 
+void ViewContent::onClickedDirectoryAddressBar(QFileInfo info)
+{
+    changeDir(info.absoluteFilePath());
+}
+
 void ViewContent::connectClickedModelIndex()
 {
     if(Properties::Instance()->singleClick)
     {
         connect(m_listView, SIGNAL(clicked(QModelIndex)),
+                this, SLOT(onView_NClicked(QModelIndex)));
+        connect(m_iconView, SIGNAL(clicked(QModelIndex)),
                 this, SLOT(onView_NClicked(QModelIndex)));
         connect(m_treeView, SIGNAL(clicked(QModelIndex)),
                 this, SLOT(onView_NClicked(QModelIndex)));
@@ -51,6 +69,8 @@ void ViewContent::connectClickedModelIndex()
     else
     {
         connect(m_listView, SIGNAL(doubleClicked(QModelIndex)),
+                this, SLOT(onView_NClicked(QModelIndex)));
+        connect(m_iconView, SIGNAL(doubleClicked(QModelIndex)),
                 this, SLOT(onView_NClicked(QModelIndex)));
         connect(m_treeView, SIGNAL(doubleClicked(QModelIndex)),
                 this, SLOT(onView_NClicked(QModelIndex)));
@@ -73,8 +93,10 @@ void ViewContent::onView_changeDir(QString path)
 {
     m_currentDir = path;
     m_listView->setRootIndex(m_model->index(m_currentDir));
+    m_iconView->setRootIndex(m_model->index(m_currentDir));
     m_treeView->setRootIndex(m_model->index(m_currentDir));
     m_tableView->setRootIndex(m_model->index(m_currentDir));
+    m_addresBar->changeAddress(m_model->fileInfo(m_model->index(path)));
     emit onChangeDir(currentDirAbsolutePath());
 }
 
@@ -179,7 +201,85 @@ void ViewContent::openFile(QModelIndex index)
 void ViewContent::hide(bool view)
 {
     if(view)
-        m_model->setFilter(QDir::AllDirs | QDir::AllEntries | QDir::Hidden);
+        m_model->setFilter(QDir::Dirs | QDir::AllDirs | QDir::Files
+                           | QDir::Drives | QDir::NoDotAndDotDot
+                           | QDir::AllEntries |QDir::Hidden);
     else
-        m_model->setFilter(QDir::AllDirs | QDir::AllEntries);
+        m_model->setFilter(QDir::Dirs | QDir::AllDirs | QDir::Files
+                           | QDir::Drives | QDir::NoDotAndDotDot | QDir::AllEntries);
+}
+
+void ViewContent::update()
+{
+    switch(stackedWidget->currentIndex())
+    {
+    case INDEX_LISTVIEW:
+        // Listview
+        m_listView->update(m_model->index(m_model->rootPath()));
+    case INDEX_ICONVIEW:
+        m_iconView->update(m_model->index(m_model->rootPath()));
+    case INDEX_TREEVIEW:
+        // Treeview
+        m_treeView->update(m_model->index(m_model->rootPath()));
+    case INDEX_TABLEVIEW:
+        // Tableview
+        m_tableView->update(m_model->index(m_model->rootPath()));
+    }
+}
+
+void ViewContent::setMode(Mode mode)
+{
+    switch(mode)
+    {
+    case ViewContent::ListView:
+        stackedWidget->setCurrentIndex(INDEX_LISTVIEW);
+        //m_listView->setViewMode(QListView::ListMode);
+        break;
+    case ViewContent::IconsView:
+        stackedWidget->setCurrentIndex(INDEX_ICONVIEW);
+        //m_iconView->setViewMode(QListView::IconMode);
+        break;
+    case ViewContent::DetailsView:
+        stackedWidget->setCurrentIndex(INDEX_TABLEVIEW);
+        break;
+    case ViewContent::TreeView:
+        stackedWidget->setCurrentIndex(INDEX_TREEVIEW);
+        break;
+    }
+}
+
+void ViewContent::copy()
+{
+    /*
+    QItemSelectionModel listSelectionModel = m_listView->selectionModel();
+
+    QModelIndexList selList;
+    if(listSelectionModel->selectedRows(0).count())
+        selList = listSelectionModel->selectedRows(0);
+    else
+        selList = listSelectionModel->selectedIndexes();
+
+    if(selList.count() == 0)
+        if(focusWidget() == tree)
+            selList << modelView->mapFromSource(modelList->index(pathEdit->itemText(0)));
+        else
+            return;
+
+    QStringList text;
+    foreach(QModelIndex item,selList)
+        text.append(modelList->filePath(modelView->mapToSource(item)));
+
+    QApplication::clipboard()->setText(text.join("\n"),QClipboard::Selection);
+    QApplication::clipboard()->setMimeData(modelView->mimeData(selList));
+    */
+}
+
+void ViewContent::move()
+{
+
+}
+
+void ViewContent::mkdir(QString name)
+{
+    m_model->mkdir(m_model->index(QDir::currentPath()), name);
 }

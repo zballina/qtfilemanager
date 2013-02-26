@@ -20,7 +20,8 @@ class Properties
         QFont defaultFont();
 
         // File manager
-        QString forceTheme;
+        bool forceTheme;
+        QString theme;
         bool realMimeTypes;
         QByteArray windowState;
         QSize windowSize;
@@ -31,8 +32,7 @@ class Properties
         int zoomList;
         int zoomDetail;
         bool showThumbs;
-        bool viewMode;
-        bool iconMode;
+        int viewMode;
         bool hiddenMode;
         QByteArray header;
         bool singleClick;

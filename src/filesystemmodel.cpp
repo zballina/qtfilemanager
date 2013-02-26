@@ -1,16 +1,18 @@
-#include "filesystemmanager.h"
+#include "filesystemmodel.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtCore/QDebug>
 
 #define BLOCK_SIZE      4096
 
-FileSystemManager::FileSystemManager(): m_cancel(false)
+FileSystemModel::FileSystemModel(QObject *parent) :
+    QFileSystemModel(parent)
 {
 }
 
-bool FileSystemManager::copyFolder(QString source, QString target, qint64 total, bool cut)
+bool FileSystemModel::copyFolder(QString source, QString target, qint64 total, bool cut)
 {
     QDir sourceFolder(source);
     QDir targetFolder(QFileInfo(target).path());
@@ -56,7 +58,7 @@ bool FileSystemManager::copyFolder(QString source, QString target, qint64 total,
     return ok;
 }
 
-bool FileSystemManager::copyFile(QString source, QString target, qint64 totalSize, bool cut)
+bool FileSystemModel::copyFile(QString source, QString target, qint64 totalSize, bool cut)
 {
     QFile fileSource(source);
     QFile fileTarget(target);
@@ -99,7 +101,25 @@ bool FileSystemManager::copyFile(QString source, QString target, qint64 totalSiz
     return true;
 }
 
-void FileSystemManager::cancellationNotice(bool cancel)
+void FileSystemModel::cancellationNotice(bool cancel)
 {
     m_cancel = cancel;
 }
+
+QVariant FileSystemModel::data(const QModelIndex &index, int role) const
+{
+    switch(role)
+    {
+    case Qt::ToolTipRole:
+        return QFileSystemModel::data(index, Qt::DisplayRole).toString();
+    }
+
+    return QFileSystemModel::data(index, role);
+}
+
+/*
+void FileSystemModel::copy(QModelIndex source, QModelIndex target)
+{
+
+}
+*/
